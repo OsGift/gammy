@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WWYD & Hot Seat Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        .question-box {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f1f1f1;
+            border-radius: 8px;
+        }
+        .hint {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+        .controls button {
+            padding: 10px 20px;
+            font-size: 1em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>What Would You Do? & Hot Seat</h1>
+
+        <div class="question-box">
+            <p id="question-text">Loading question...</p>
+            <p id="question-hint" class="hint"></p>
+        </div>
+
+        <div class="controls">
+            <button id="next-btn">Next Question</button>
+        </div>
+    </div>
+
+    <script>
+        async function fetchQuestions() {
+            const res = await fetch('/api/questions');
+            return await res.json();
+        }
+
+        function showRandomQuestion(questions) {
+            const random = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('question-text').textContent = random.prompt;
+            document.getElementById('question-hint').textContent = random.hint || '';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const questions = await fetchQuestions();
+            showRandomQuestion(questions);
+
+            document.getElementById('next-btn').addEventListener('click', () => {
+                showRandomQuestion(questions);
+            });
+        });
+    </script>
+</body>
+</html>
