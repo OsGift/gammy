@@ -3,67 +3,67 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Bible Puzzle — Persistent Multiplayer</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<title>Bible Quiz — Books & Characters</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#081126; --panel:#071226; --muted:#94a3b8; --accent:#06b6d4;
-    --card:#0b1220; --glass:rgba(255,255,255,0.03)
+    --bg1:#041026; --bg2:#071734; --card:#081226;
+    --accent:#06b6d4; --accent-2:#7c3aed; --muted:#94a3b8;
+    --glass:rgba(255,255,255,0.03)
   }
   *{box-sizing:border-box}
   body{
-    margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
-    background:linear-gradient(180deg,#041026 0%, #061529 60%);
+    margin:0; font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+    background: linear-gradient(180deg,var(--bg1),var(--bg2));
     color:#e6eef6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
-    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:28px;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
   }
   .app{width:100%; max-width:1100px}
-  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-  h1{font-weight:700;margin:0;font-size:1.4rem;color:var(--accent)}
-  .sub{color:var(--muted); font-size:0.9rem}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  h1{margin:0;color:var(--accent);font-size:1.4rem}
+  .sub{color:var(--muted);font-size:0.9rem}
   .layout{display:grid;grid-template-columns:360px 1fr;gap:18px}
-  @media (max-width:900px){.layout{grid-template-columns:1fr;}}
-  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:16px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
-  /* Setup panel */
-  label{display:block;font-weight:600;margin:8px 0 6px;color:#dbeafe}
+  @media (max-width:900px){.layout{grid-template-columns:1fr}}
+  .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:14px;padding:14px;box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+  label{display:block;font-weight:600;margin:10px 0 6px;color:#dbeafe}
   textarea,input,select{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:14px}
   .btn{background:linear-gradient(90deg,var(--accent),#06b6b9);border:none;padding:10px 14px;border-radius:10px;color:#021025;font-weight:700;cursor:pointer}
   .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
   .players-list{margin-top:10px;padding:10px;border-radius:10px;background:var(--glass);min-height:120px;max-height:260px;overflow:auto}
-  .player{display:flex;align-items:center;justify-content:space-between;padding:10px;margin-bottom:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));cursor:grab}
+  .player{display:flex;align-items:center;justify-content:space-between;padding:10px;margin-bottom:8px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));cursor:grab}
   .player.dragging{opacity:0.5;transform:scale(0.995)}
-  .player .name{font-weight:600}
+  .player .name{font-weight:700}
   .muted{color:var(--muted);font-size:0.9rem}
-  /* Game panel */
+  /* Game area */
   .game-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .banner{display:flex;flex-direction:column}
+  .category-badge{background:linear-gradient(90deg,var(--accent-2),var(--accent));padding:8px 12px;border-radius:999px;font-weight:800;color:#021025;display:inline-block}
   .current-player{font-weight:800;font-size:1.1rem;color:#dbeafe}
   .timer{font-weight:900;font-size:1.6rem;color:#ffb020}
   .progress{color:var(--muted);font-size:0.9rem}
-  .clue-box{margin-top:18px;border-radius:12px;padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
-  .clue{font-size:3rem;letter-spacing:4px}
+  .clue-box{margin-top:18px;border-radius:12px;padding:22px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));box-shadow:inset 0 1px 0 rgba(255,255,255,0.02);min-height:150px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+  .clue{font-size:3.2rem;letter-spacing:6px}
   .hint{margin-top:12px;font-size:1.05rem;color:#fbbf24}
   .answer{margin-top:8px;font-size:1.05rem;color:#22c55e}
-  .controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .controls{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;justify-content:center}
   .btn.big{padding:12px 20px;font-size:1rem;border-radius:12px}
   .btn.danger{background:linear-gradient(90deg,#ef4444,#f97316);color:white}
-  .small-muted{font-size:0.9rem;color:var(--muted);margin-top:8px}
-  /* Scoreboard */
+  .small-muted{font-size:0.9rem;color:var(--muted);margin-top:8px;text-align:center}
   .score-row{display:flex;justify-content:space-between;padding:12px;border-radius:10px;margin-bottom:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008))}
-  .footer{margin-top:12px;color:var(--muted);font-size:0.9rem;text-align:center}
-  /* subtle animations */
-  .fade-in{animation:fadeIn .28s ease}
-  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  footer{margin-top:12px;color:var(--muted);font-size:0.9rem;text-align:center}
+  .fade{animation:fade .28s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
   <div class="app">
     <header>
       <div>
-        <h1>Bible Puzzle — Multiplayer</h1>
-        <div class="sub">Turn-based rounds · persistent · polish UI</div>
+        <h1>Bible Quiz — Books & Characters</h1>
+        <div class="sub">Choose category · persistent rounds · polished UI</div>
       </div>
       <div>
-        <button id="clearStorageBtn" class="btn ghost">New Game</button>
+        <button id="clearStorageBtn" class="btn ghost">New Game (clear save)</button>
       </div>
     </header>
 
@@ -73,8 +73,7 @@
         <label>Participants (one per line)</label>
         <textarea id="namesInput" rows="6" placeholder="Alice
 Bob
-Chike" ></textarea>
-
+Chike"></textarea>
         <div style="display:flex;gap:8px;margin-top:8px">
           <button id="loadPlayersBtn" class="btn">Load Players</button>
           <button id="resetNamesBtn" class="btn ghost">Clear</button>
@@ -83,27 +82,30 @@ Chike" ></textarea>
         <label style="margin-top:12px">Starting Order (drag to reorder)</label>
         <div class="players-list" id="playersList" aria-label="Player order"></div>
 
+        <label style="margin-top:10px">Category</label>
+        <select id="categorySelect">
+          <option value="books">📖 Guess the Book of the Bible</option>
+          <option value="characters">👤 Guess the Bible Character</option>
+        </select>
+
         <label style="margin-top:10px">Number of questions this round</label>
         <input id="numQuestions" type="number" min="1" value="12" />
 
         <div style="display:flex;gap:10px;margin-top:12px">
-          <button id="startBtn" class="btn">Start / Resume</button>
+          <button id="startBtn" class="btn">Start / Start Round</button>
           <button id="resumeBtn" class="btn ghost">Resume Saved</button>
         </div>
 
-        <div class="small-muted">Questions are randomized each round and won't repeat within the round. Refreshing will not lose progress.</div>
+        <div class="small-muted" style="margin-top:10px">Questions come from the selected category. Refreshing does not lose progress. Click "New Game" to clear saved state.</div>
       </section>
 
       <!-- RIGHT: Game -->
       <section class="panel" id="gamePanel">
-        <div id="gameInner">
-          <!-- populated by JS -->
-          <div class="muted">No game running. Set up players and click Start.</div>
-        </div>
+        <div id="gameInner"><div class="muted">No game running. Configure players and start a round.</div></div>
       </section>
     </main>
 
-    <div class="footer">Pro UI by your virtual frontend engineer — sounds enabled after first start.</div>
+    <footer>Created for you — sounds enabled after first Start/Resume click.</footer>
   </div>
 
   <!-- Sounds -->
@@ -113,9 +115,11 @@ Chike" ></textarea>
 
 <script>
 /* =========================
-   DATA: full question set you provided (condensed objects)
+   DATA: Questions per category
+   - books: includes all the Book questions you provided (emoji puzzles, cryptic, riddles, mini-scenarios)
+   - characters: created ~34 diverse entries (emoji, cryptic, riddles, scenarios)
    ========================= */
-const ALL_QUESTIONS = [
+const BOOKS_QUESTIONS = [
   // Emoji Puzzles
   { clue: "🐑🕊️", hint: "Psalms (or Psalm 23 specifically)", answer: "Psalms" },
   { clue: "🌾🍞🍷", hint: "Feeding of 5,000 & Last Supper symbolism", answer: "John / Gospels" },
@@ -152,8 +156,8 @@ const ALL_QUESTIONS = [
   { clue: "Born of exile; rebuilding walls & worship", hint: "Cupbearer turned builder", answer: "Nehemiah" },
   { clue: "Shepherd becomes king; covenant & temple plans", hint: "Samuel's writings", answer: "1 Samuel / 2 Samuel" },
   { clue: "Logical writer tracing Jesus' teachings", hint: "Physician writer", answer: "Luke" },
-  { clue: "Courtroom poem and childless couple rejoicing", hint: "Hannah & deliverance", answer: "Judges / 1 Samuel" },
-  { clue: "Visions of beasts, horns & little scroll", hint: "Apocalyptic seer", answer: "Daniel / Revelation" },
+  { clue: "Courtroom poem & childless couple rejoicing", hint: "Hannah & deliverance", answer: "Judges / 1 Samuel" },
+  { clue: "Visions of beasts, horns & a little scroll", hint: "Apocalyptic seer", answer: "Daniel / Revelation" },
   { clue: "Practical maxims; father's short advice", hint: "Wisdom literature", answer: "Proverbs" },
 
   // Mini-Scenario
@@ -161,52 +165,76 @@ const ALL_QUESTIONS = [
   { clue: "You're told to build an ark; birds prove dryness", hint: "Rainbow promise", answer: "Genesis" },
   { clue: "A prophet is taken in a whirlwind into heaven", hint: "Fiery chariot", answer: "2 Kings" },
   { clue: "Stone rolled away; angels at the tomb", hint: "Resurrection morning", answer: "Gospels" },
-  { clue: "You stand with Nehemiah planning a city wall", hint: "Post-exile restoration", answer: "Nehemiah" },
-  { clue: "You read love letters in an ancient courtship song", hint: "Romantic allegory", answer: "Song of Solomon" },
+  { clue: "Nehemiah planning a city wall — which book?", hint: "Post-exile restoration", answer: "Nehemiah" },
+  { clue: "Love letters in an ancient courtship song", hint: "Romantic allegory", answer: "Song of Solomon" },
   { clue: "Valley of dry bones becomes warriors", hint: "Prophet in exile", answer: "Ezekiel" },
-  { clue: "A meek tax collector climbs a tree to see a teacher", hint: "Zacchaeus story", answer: "Luke" },
+  { clue: "A meek tax collector climbs a tree", hint: "Zacchaeus story", answer: "Luke" },
   { clue: "A virgin told she'll bear a son: 'God with us'", hint: "Nativity prophecy", answer: "Matthew / Luke" },
   { clue: "A prophet survives a den of predators", hint: "Royal decree gone wrong", answer: "Daniel" }
 ];
 
-/* =========================
-   Persistence helpers
-   ========================= */
-const STORAGE_KEY = 'bible_quiz_v1';
+const CHARACTER_QUESTIONS = [
+  // 34 entries — mixture of emoji, cryptic, riddles, scenarios
+  { clue: "👨‍🌾🍎", hint: "First man in Eden", answer: "Adam" },
+  { clue: "👩‍🌾🍎", hint: "First woman in Eden", answer: "Eve" },
+  { clue: "🌧️🕊️🌈", hint: "Built an ark; rainbow promise", answer: "Noah" },
+  { clue: "🔥⭐→descendants", hint: "Father of many nations; covenant with God", answer: "Abraham" },
+  { clue: "👵➡️🎯 (barrenness then laughter)", hint: "Wife of Abraham who laughed at promise", answer: "Sarah" },
+  { clue: "🥖🥩→sacrifice", hint: "Son of Abraham who carries wood for a sacrifice", answer: "Isaac" },
+  { clue: "🧵👔🛌→dreams", hint: "Sold by brothers, later in Egypt interpreting dreams", answer: "Joseph" },
+  { clue: "🔥🌊→leader", hint: "Led Israelites out of Egypt, parted the sea", answer: "Moses" },
+  { clue: "👨‍⚖️📜→priest", hint: "Aaron was the first high priest", answer: "Aaron" },
+  { clue: "🗡️🏹→judge & judge-slayer", hint: "Israelite judge known for long hair and great strength", answer: "Samson" },
+  { clue: "🛡️👑→first king", hint: "Anointed as Israel's first king", answer: "Saul" },
+  { clue: "🏹🎵👑", hint: "Shepherd, harp player, became king after Saul", answer: "David" },
+  { clue: "🕊️⚖️👑", hint: "Wisdom, builder of the Temple, very wealthy king", answer: "Solomon" },
+  { clue: "🔥🚒—hid in cave", hint: "Challenged prophets of Baal; taken up in whirlwind", answer: "Elijah" },
+  { clue: "🧑‍⚕️✍️→historian", hint: "Wrote Gospel and Acts; a physician", answer: "Luke" },
+  { clue: "🌊🐳 (swallowed)", hint: "Prophet swallowed by a great fish", answer: "Jonah" },
+  { clue: "👰→queen (saved people)", hint: "Clever queen who saved her people in Persia", answer: "Esther" },
+  { clue: "👩‍🌾➡️loyal", hint: "Moabite who stayed with Naomi", answer: "Ruth" },
+  { clue: "✝️—teacher, miracles", hint: "Central figure of the New Testament", answer: "Jesus" },
+  { clue: "🚶‍♂️👣—denied, restored", hint: "Fisherman who denied Jesus three times, later restored", answer: "Peter" },
+  { clue: "📜✍️→missionary", hint: "Persecutor turned apostle to the Gentiles", answer: "Paul" },
+  { clue: "🧔🔔—forerunner", hint: "Baptized Jesus and called people to repentance", answer: "John the Baptist" },
+  { clue: "🪢🏙️—faithful spy", hint: "Rahab, the Canaanite who hid Israelite spies", answer: "Rahab" },
+  { clue: "🎻🎼(psalms)", hint: "Wrote many psalms, king of Israel", answer: "David" },
+  { clue: "🪓🏛️→rebuild", hint: "Cupbearer who rebuilt Jerusalem's wall", answer: "Nehemiah" },
+  { clue: "👵➡️son miracle", hint: "Hannah prayed and bore Samuel", answer: "Hannah" },
+  { clue: "⚖️⚔️→judge", hint: "Prophet and judge who anointed David", answer: "Samuel" },
+  { clue: "🧱→wisdom writer", hint: "Wrote Proverbs, son of David", answer: "Solomon" },
+  { clue: "🕶️➡️vision (apostle)", hint: "Beloved disciple, wrote Gospel and Revelation", answer: "John (the Apostle)" },
+  { clue: "🧾➡️tax collector", hint: "Climbed a tree to see Jesus", answer: "Zacchaeus" },
+  { clue: "👑➡️wise woman", hint: "Queen and advisor in 1 Kings (helped save city?) — alternative: Abigail", answer: "Abigail" },
+  { clue: "🇮🇱→messenger (prophet)", hint: "Weeping prophet from Jerusalem", answer: "Jeremiah" },
+  { clue: "📜→visions of dry bones", hint: "Saw the valley of dry bones", answer: "Ezekiel" }
+];
 
-function saveState(state){
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch(e){ console.warn('Save failed', e); }
-}
-function loadState(){
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch(e){ return null; }
-}
-function clearState(){
-  localStorage.removeItem(STORAGE_KEY);
-}
 
-/* =========================
-   Game state (persisted object)
-   ========================= */
+// =========================
+// Persistence & state
+// =========================
+const STORAGE_KEY = 'bible_quiz_categories_v1';
+
+function saveState(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){console.warn('save fail',e);} }
+function loadState(){ try{ const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; }catch(e){return null;} }
+function clearState(){ localStorage.removeItem(STORAGE_KEY); }
+
+// app state
 let state = {
-  phase: 'setup', // 'setup' | 'playing' | 'score'
-  players: [],    // ordered array
-  scores: {},     // name->score
-  deck: [],       // remaining questions (objects)
+  phase: 'setup',    // 'setup' | 'playing' | 'score'
+  players: [],
+  scores: {},
+  deck: [],          // remaining questions for this round
   usedCountThisRound: 0,
   roundCount: 12,
   currentPlayerIndex: 0,
   currentQuestion: null,
-  countdown: 0
+  countdown: 0,
+  category: 'books'  // 'books' | 'characters'
 };
 
-/* =========================
-   DOM refs
-   ========================= */
+// DOM refs
 const namesInput = document.getElementById('namesInput');
 const loadPlayersBtn = document.getElementById('loadPlayersBtn');
 const resetNamesBtn = document.getElementById('resetNamesBtn');
@@ -214,70 +242,52 @@ const playersList = document.getElementById('playersList');
 const numQuestionsInput = document.getElementById('numQuestions');
 const startBtn = document.getElementById('startBtn');
 const resumeBtn = document.getElementById('resumeBtn');
+const categorySelect = document.getElementById('categorySelect');
 const clearStorageBtn = document.getElementById('clearStorageBtn');
-const gamePanel = document.getElementById('gamePanel');
 const gameInner = document.getElementById('gameInner');
-
 const tickSound = document.getElementById('tickSound');
 const revealSound = document.getElementById('revealSound');
 const endSound = document.getElementById('endSound');
 
 let tickInterval = null;
 
-/* =========================
-   Utilities
-   ========================= */
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j=Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
+// helpers
+function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+function cloneDeckForCategory(cat){
+  if(cat === 'books') return BOOKS_QUESTIONS.map(q => ({...q}));
+  return CHARACTER_QUESTIONS.map(q => ({...q}));
 }
+function persist(){ saveState(state); }
 
-function cloneDeck(){
-  // deep-ish clone of question objects to avoid mutating ALL_QUESTIONS
-  return ALL_QUESTIONS.map(q => ({...q}));
-}
-
-function persist(){
-  saveState(state);
-}
-
-/* =========================
-   Render players list (drag & drop)
-   Attach handlers exactly once per render to avoid duplicates
-   ========================= */
+// render players list (attach drag handlers freshly)
 function renderPlayers(){
   playersList.innerHTML = '';
   state.players.forEach((name, idx) => {
-    const item = document.createElement('div');
-    item.className = 'player';
-    item.draggable = true;
-    item.dataset.index = idx;
-    item.innerHTML = `<div class="name">${name}</div><div class="handle muted">≡</div>`;
-    playersList.appendChild(item);
+    const div = document.createElement('div');
+    div.className = 'player';
+    div.draggable = true;
+    div.dataset.index = idx;
+    div.innerHTML = `<div class="name">${escapeHtml(name)}</div><div class="handle muted">≡</div>`;
+    playersList.appendChild(div);
 
-    item.addEventListener('dragstart', (e) => {
-      item.classList.add('dragging');
+    div.addEventListener('dragstart', e => {
+      div.classList.add('dragging');
       e.dataTransfer.setData('text/plain', idx);
     });
-    item.addEventListener('dragend', () => {
-      item.classList.remove('dragging');
-      // after drag end, re-sync state.players based on DOM order
+    div.addEventListener('dragend', () => {
+      div.classList.remove('dragging');
+      // re-sync order
       const items = Array.from(playersList.querySelectorAll('.player'));
       state.players = items.map(it => it.querySelector('.name').textContent.trim());
-      // also reinitialize scores object keys in case names changed order
+      // ensure scores object has keys
       state.scores = state.scores || {};
-      state.players.forEach(p => { if(typeof state.scores[p] === 'undefined') state.scores[p] = 0; });
+      state.players.forEach(p=>{ if(typeof state.scores[p] === 'undefined') state.scores[p]=0; });
       persist();
-      renderPlayers(); // re-render to update indices
+      renderPlayers();
     });
   });
 
-  // attach dragover handler to list (single handler)
-  playersList.ondragover = (e) => {
+  playersList.ondragover = e => {
     e.preventDefault();
     const dragging = playersList.querySelector('.dragging');
     const after = getDragAfterElement(playersList, e.clientY);
@@ -286,26 +296,21 @@ function renderPlayers(){
     else playersList.insertBefore(dragging, after);
   };
 }
-
-/* helper */
 function getDragAfterElement(container, y){
   const draggable = [...container.querySelectorAll('.player:not(.dragging)')];
   let closest = {offset: Number.NEGATIVE_INFINITY, element: null};
   for(const child of draggable){
     const box = child.getBoundingClientRect();
     const offset = y - box.top - box.height/2;
-    if(offset < 0 && offset > closest.offset){
-      closest = {offset, element: child};
-    }
+    if(offset < 0 && offset > closest.offset) closest = {offset, element: child};
   }
   return closest.element;
 }
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
 
-/* =========================
-   Setup button handlers
-   ========================= */
+// Setup handlers
 loadPlayersBtn.addEventListener('click', () => {
-  const raw = namesInput.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const raw = namesInput.value.split('\n').map(s=>s.trim()).filter(Boolean);
   if(raw.length === 0){ alert('Add at least one participant.'); return; }
   state.players = raw.slice();
   state.scores = {};
@@ -313,93 +318,80 @@ loadPlayersBtn.addEventListener('click', () => {
   renderPlayers();
   persist();
 });
+resetNamesBtn.addEventListener('click', ()=>{ namesInput.value = ''; });
 
-resetNamesBtn.addEventListener('click', () => {
-  namesInput.value = '';
-});
-
-/* Start or Resume */
-startBtn.addEventListener('click', () => {
-  if(state.players.length === 0){
-    alert('Load players first (enter names and click Load Players).');
-    return;
-  }
+// Start / Resume
+startBtn.addEventListener('click', ()=> {
+  if(state.players.length === 0){ alert('Load players first (enter names and click Load Players).'); return; }
   const n = parseInt(numQuestionsInput.value) || 0;
   if(n <= 0){ alert('Enter valid number of questions'); return; }
-  // initialize round
-  state.roundCount = Math.min(n, 9999);
-  state.deck = shuffle(cloneDeck());
+  state.roundCount = n;
+  state.category = categorySelect.value;
+  // build deck
+  state.deck = shuffle(cloneDeckForCategory(state.category));
   state.usedCountThisRound = 0;
   state.currentPlayerIndex = 0;
-  // reset scores for new round
-  state.scores = {};
-  state.players.forEach(p => state.scores[p] = 0);
+  state.scores = {}; state.players.forEach(p => state.scores[p] = 0);
   state.phase = 'playing';
+  state.currentQuestion = null;
+  state.countdown = 0;
   persist();
   renderGame();
-  startTurn(); // begins first turn
+  startTurn(false);
 });
-
-resumeBtn.addEventListener('click', () => {
+resumeBtn.addEventListener('click', ()=> {
   const saved = loadState();
-  if(!saved){
-    alert('No saved game found.');
-    return;
-  }
+  if(!saved){ alert('No saved game found'); return; }
   state = saved;
+  // re-render UI values
+  namesInput.value = state.players.join('\n');
+  categorySelect.value = state.category || 'books';
+  numQuestionsInput.value = state.roundCount || 12;
   renderPlayers();
   renderGame();
-  if(state.phase === 'playing') {
-    // if a countdown was in progress, resume it
-    startTurn(true);
-  }
+  if(state.phase === 'playing') startTurn(true); // resume ticking if needed
 });
 
-/* New Game (clear storage) */
-clearStorageBtn.addEventListener('click', () => {
-  if(!confirm('Clear saved game and start new game?')) return;
+// Clear saved
+clearStorageBtn.addEventListener('click', ()=> {
+  if(!confirm('Clear saved game and return to setup?')) return;
   clearState();
-  state = {
-    phase: 'setup', players: [], scores: {}, deck: [], usedCountThisRound: 0, roundCount: 12,
-    currentPlayerIndex: 0, currentQuestion: null, countdown: 0
-  };
+  state = { phase:'setup', players:[], scores:{}, deck:[], usedCountThisRound:0, roundCount:12, currentPlayerIndex:0, currentQuestion:null, countdown:0, category:'books' };
   namesInput.value = '';
   numQuestionsInput.value = 12;
   renderPlayers();
   renderGame();
 });
 
-/* =========================
-   Game rendering and flow
-   ========================= */
+// Render game area depending on phase
 function renderGame(){
   if(state.phase === 'setup' || !state.players.length){
-    gameInner.innerHTML = `<div class="muted">No game running. Configure players and press Start.</div>`;
+    gameInner.innerHTML = `<div class="muted">No game running. Configure players and click Start.</div>`;
     return;
   }
   if(state.phase === 'playing'){
-    // build playing UI
     const cp = state.players[state.currentPlayerIndex] || '—';
     gameInner.innerHTML = `
       <div class="game-top">
-        <div>
-          <div class="muted">Round player</div>
+        <div class="banner">
+          <div class="category-badge">${state.category==='books' ? '📖 Guess the Book' : '👤 Guess the Character'}</div>
+          <div style="margin-top:8px;color:var(--muted)">Round player</div>
           <div class="current-player">${escapeHtml(cp)}</div>
         </div>
-        <div>
+        <div style="text-align:center">
           <div class="muted">Timer</div>
           <div class="timer" id="timerEl">${state.countdown || 10}</div>
         </div>
-        <div>
+        <div style="text-align:right">
           <div class="muted">Progress</div>
           <div class="progress" id="progressEl">${state.usedCountThisRound} / ${state.roundCount}</div>
         </div>
       </div>
 
-      <div class="clue-box fade-in">
+      <div class="clue-box fade">
         <div class="clue" id="clueEl">${state.currentQuestion ? escapeHtml(state.currentQuestion.clue) : '—'}</div>
-        <div class="hint" id="hintEl">${state.currentQuestion && state.countdown <=5 ? '💡 ' + escapeHtml(state.currentQuestion.hint) : ''}</div>
-        <div class="answer" id="answerEl">${state.currentQuestion && state.countdown<=0 ? '✅ ' + escapeHtml(state.currentQuestion.answer) : ''}</div>
+        <div class="hint" id="hintEl">${state.currentQuestion && state.countdown <= 5 ? '💡 ' + escapeHtml(state.currentQuestion.hint) : ''}</div>
+        <div class="answer" id="answerEl">${state.currentQuestion && state.countdown <= 0 ? '✅ ' + escapeHtml(state.currentQuestion.answer) : ''}</div>
       </div>
 
       <div class="controls">
@@ -410,21 +402,20 @@ function renderGame(){
 
       <div class="small-muted">Press "Got It!" to award the current player 1 point before reveal. Hint shows at 5s, answer at 0s.</div>
 
-      <div style="margin-top:18px">
+      <div style="margin-top:14px">
         <div class="muted">Scores</div>
         <div id="scoresList" style="margin-top:8px"></div>
       </div>
     `;
     renderScores();
-    // attach controls
-    document.getElementById('gotItBtn').onclick = () => claimPoint();
-    document.getElementById('skipBtn').onclick = () => revealAnswer(true);
-    document.getElementById('endRoundBtn').onclick = () => { state.usedCountThisRound = state.roundCount; persist(); endRound(); };
+    // wire buttons
+    document.getElementById('gotItBtn').onclick = claimPoint;
+    document.getElementById('skipBtn').onclick = ()=> revealAnswer(true);
+    document.getElementById('endRoundBtn').onclick = ()=> { state.usedCountThisRound = state.roundCount; persist(); endRound(); };
     return;
   }
   if(state.phase === 'score'){
-    // show scoreboard + options
-    const rows = state.players.map((p, i) => `<div class="score-row"><div>${i+1}. ${escapeHtml(p)}</div><div>${state.scores[p]||0}</div></div>`).join('');
+    const rows = state.players.map((p,i)=>`<div class="score-row"><div>${i+1}. ${escapeHtml(p)}</div><div>${state.scores[p]||0}</div></div>`).join('');
     gameInner.innerHTML = `
       <h2 style="margin:6px 0 12px;color:var(--accent)">Round Results</h2>
       ${rows}
@@ -433,124 +424,86 @@ function renderGame(){
         <button class="btn ghost" id="backSetupBtn">Back to Setup</button>
       </div>
     `;
-    document.getElementById('nextRoundBtn').onclick = () => {
-      // reset deck and counters, but keep players/order
-      state.deck = shuffle(cloneDeck());
+    document.getElementById('nextRoundBtn').onclick = ()=> {
+      state.deck = shuffle(cloneDeckForCategory(state.category));
       state.usedCountThisRound = 0;
       state.currentPlayerIndex = 0;
-      state.scores = {}; state.players.forEach(p => state.scores[p] = 0);
-      state.phase = 'playing';
-      state.currentQuestion = null;
-      state.countdown = 0;
-      persist();
-      renderGame();
-      startTurn();
+      // keep players and order; reset scores
+      state.scores = {}; state.players.forEach(p=>state.scores[p]=0);
+      state.phase = 'playing'; state.currentQuestion=null; state.countdown=0;
+      persist(); renderGame(); startTurn(false);
     };
-    document.getElementById('backSetupBtn').onclick = () => {
-      state.phase = 'setup'; persist(); renderGame();
-    };
+    document.getElementById('backSetupBtn').onclick = ()=> { state.phase='setup'; persist(); renderGame(); };
     return;
   }
 }
 
-/* Render scores panel */
+// Render scoreboard in playing UI
 function renderScores(){
   const box = document.getElementById('scoresList');
   if(!box) return;
-  box.innerHTML = state.players.map(p => `<div class="score-row"><div>${escapeHtml(p)}</div><div>${state.scores[p]||0}</div></div>`).join('');
+  box.innerHTML = state.players.map(p=>`<div class="score-row"><div>${escapeHtml(p)}</div><div>${state.scores[p]||0}</div></div>`).join('');
 }
 
-/* Start a player's turn. If resume=true, continue from saved countdown, else reset countdown to 10 */
+// Turn logic
 function startTurn(resume=false){
   if(state.usedCountThisRound >= state.roundCount){ endRound(); return; }
-
-  // if deck empty, refill from master
-  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeck());
-
-  // pick random question from deck and remove it
-  const idx = Math.floor(Math.random() * state.deck.length);
+  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeckForCategory(state.category));
+  // pick random from deck
+  const idx = Math.floor(Math.random()*state.deck.length);
   state.currentQuestion = state.deck.splice(idx,1)[0];
-  state.usedCountThisRound = (state.usedCountThisRound || 0) + 1;
-  // set countdown
+  state.usedCountThisRound = (state.usedCountThisRound||0) + 1;
   state.countdown = resume ? (state.countdown || 10) : 10;
-  // set phase
   state.phase = 'playing';
   persist();
   renderGame();
 
-  // start tick loop
+  // start ticks
   stopTick();
-  // Immediately attempt to play tick sound for user gesture constraints (may fail silently)
   safePlay(tickSound);
-  tickInterval = setInterval(() => {
+  tickInterval = setInterval(()=>{
     state.countdown--;
-    // Update displayed timer
-    const timerEl = document.getElementById('timerEl');
-    if(timerEl) timerEl.textContent = state.countdown;
-    // play tick on >0
+    const timerEl = document.getElementById('timerEl'); if(timerEl) timerEl.textContent = state.countdown;
     if(state.countdown > 0) safePlay(tickSound);
-    // at 5 seconds show hint
     if(state.countdown === 5){
-      const hintEl = document.getElementById('hintEl');
-      if(hintEl && state.currentQuestion) hintEl.textContent = '💡 ' + state.currentQuestion.hint;
+      const hintEl = document.getElementById('hintEl'); if(hintEl && state.currentQuestion) hintEl.textContent = '💡 ' + state.currentQuestion.hint;
       safePlay(revealSound);
     }
-    // when reaches 0 reveal answer and stop
     if(state.countdown <= 0){
       revealAnswer(false);
     }
-    // persist countdown each tick so refresh resumes
     persist();
-  }, 1000);
+  },1000);
 }
 
-/* Stop ticking */
-function stopTick(){
-  if(tickInterval){ clearInterval(tickInterval); tickInterval = null; }
-}
+function stopTick(){ if(tickInterval){ clearInterval(tickInterval); tickInterval=null; } }
 
-/* Reveal answer; if skipped=true then no points. */
 function revealAnswer(skipped){
   stopTick();
   state.countdown = 0;
   const ansEl = document.getElementById('answerEl');
   if(ansEl && state.currentQuestion) ansEl.textContent = '✅ ' + state.currentQuestion.answer + (skipped ? ' — skipped (no point)' : '');
-  safePlay(revealSound);
-  safePlay(endSound);
-  // disable got/skip by replacing onclick handlers
-  const gotBtn = document.getElementById('gotItBtn');
-  const skipBtn = document.getElementById('skipBtn');
-  if(gotBtn) gotBtn.onclick = null;
-  if(skipBtn) skipBtn.onclick = null;
+  safePlay(revealSound); safePlay(endSound);
+  // disable buttons by removing handlers
+  const got = document.getElementById('gotItBtn'); if(got) got.onclick = null;
+  const skip = document.getElementById('skipBtn'); if(skip) skip.onclick = null;
 
-  // after short pause, advance to next player/turn
-  setTimeout(() => {
+  setTimeout(()=>{
     // advance player
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length;
-    // if usedCountThisRound >= roundCount, end round
-    if(state.usedCountThisRound >= state.roundCount){
-      endRound();
-    } else {
-      state.currentQuestion = null;
-      state.countdown = 0;
-      persist();
-      startTurn(false);
-    }
+    if(state.usedCountThisRound >= state.roundCount){ endRound(); }
+    else { state.currentQuestion = null; state.countdown = 0; persist(); startTurn(false); }
   }, 1400);
 }
 
-/* Claim point for current player (Got It!) */
 function claimPoint(){
-  // award only if countdown > 0
   if(!state.currentQuestion || state.countdown <= 0) return;
   const player = state.players[state.currentPlayerIndex];
-  state.scores[player] = (state.scores[player] || 0) + 1;
-  // reveal answer and proceed
-  revealAnswer(false);
+  state.scores[player] = (state.scores[player]||0)+1;
   persist();
+  revealAnswer(false);
 }
 
-/* End of round - show scoreboard */
 function endRound(){
   stopTick();
   state.phase = 'score';
@@ -558,31 +511,24 @@ function endRound(){
   renderGame();
 }
 
-/* Safe audio play that ignores promise rejection */
 function safePlay(audioEl){
   if(!audioEl) return;
-  try{
-    audioEl.currentTime = 0;
-    const p = audioEl.play();
-    if(p && typeof p.then === 'function') p.catch(()=>{/* ignore */});
-  }catch(e){}
+  try{ audioEl.currentTime = 0; const p = audioEl.play(); if(p && typeof p.then === 'function') p.catch(()=>{}); }catch(e){}
 }
 
-/* escape html */
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
-
-/* =========================
-   Boot: try to load saved state and render UI
-   ========================= */
+// initialize from saved state if exists
 (function init(){
   const saved = loadState();
   if(saved){
-    // merge saved state carefully (in case schema changed)
     state = Object.assign(state, saved);
+    // populate UI inputs to reflect saved state
+    namesInput.value = state.players.join('\n');
+    categorySelect.value = state.category || 'books';
+    numQuestionsInput.value = state.roundCount || 12;
   }
-  // if players exist, render players list
   renderPlayers();
   renderGame();
+  // if playing, don't auto-start tick (we'll resume when user clicks Resume)
 })();
 
 </script>
