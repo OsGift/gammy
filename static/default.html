@@ -4,83 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WWYD & Hot Seat Game</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Custom font for a clean look */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body {
-            font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        h1 {
-            color: #333;
-        }
-        .question-box {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f1f1f1;
-            border-radius: 8px;
-        }
-        .hint {
-            font-size: 0.9em;
-            color: #666;
-            margin-top: 10px;
-        }
-        .controls button {
-            padding: 10px 20px;
-            font-size: 1em;
-            background: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background: #45a049;
+            font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <h1>What Would You Do? & Hot Seat</h1>
+<body class="bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center min-h-screen p-4">
 
-        <div class="question-box">
-            <p id="question-text">Loading question...</p>
-            <p id="question-hint" class="hint"></p>
+    <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-lg w-full text-center transform transition-all duration-300 hover:scale-105">
+
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6 leading-tight">
+            What Would You Do?
+        </h1>
+
+        <!-- The question card section -->
+        <div class="bg-gray-50 rounded-2xl p-6 md:p-8 mb-6 border-2 border-gray-200">
+            <p id="question-text" class="text-xl md:text-2xl font-semibold text-gray-700 leading-relaxed min-h-[6rem] flex items-center justify-center">
+                Click "Next Question" to begin...
+            </p>
+            <p id="question-hint" class="text-sm text-gray-500 mt-4 italic"></p>
         </div>
 
-        <div class="controls">
-            <button id="next-btn">Next Question</button>
+        <!-- Button container -->
+        <div class="flex flex-col items-center">
+            <button id="next-btn" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-purple-700 focus:outline-none focus:ring-4 focus:ring-purple-300 transition-all duration-200 ease-in-out transform hover:-translate-y-1">
+                Next Question
+            </button>
+            <p id="loading-text" class="text-sm text-gray-500 mt-4 opacity-0 transition-opacity duration-300">
+                Loading...
+            </p>
         </div>
+
     </div>
 
     <script>
-        async function fetchQuestions() {
-            const res = await fetch('/api/questions');
-            return await res.json();
-        }
+        // A hardcoded list of questions to make the game runnable without an external API.
+        const questions = [
+            { prompt: "You find a wallet on the street with $200 inside. What do you do?", hint: "Consider the consequences of each choice." },
+            { prompt: "A friend asks you to lie for them to their parents. What do you do?", hint: "Think about loyalty vs. honesty." },
+            { prompt: "You're at a restaurant and the waiter accidentally gives you an extra dessert you didn't order. What do you do?", hint: "What's the right thing to do in this situation?" },
+            { prompt: "You see someone cheating on a test. What do you do?", hint: "Think about the school's rules and your own values." },
+            { prompt: "A coworker takes credit for a project you did most of the work on. What do you do?", hint: "How would you handle this professionally?" },
+            { prompt: "Your friend tells you a secret, but you know it could help another person. What do you do?", hint: "Think about trust and helping others." }
+        ];
 
-        function showRandomQuestion(questions) {
+        // Function to display a random question from the array
+        function showRandomQuestion() {
             const random = questions[Math.floor(Math.random() * questions.length)];
-            document.getElementById('question-text').textContent = random.prompt;
-            document.getElementById('question-hint').textContent = random.hint || '';
+            const questionText = document.getElementById('question-text');
+            const questionHint = document.getElementById('question-hint');
+            
+            // Update the text content
+            questionText.textContent = random.prompt;
+            questionHint.textContent = random.hint || '';
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const questions = await fetchQuestions();
-            showRandomQuestion(questions);
+        // Event listener for the "Next Question" button
+        document.getElementById('next-btn').addEventListener('click', () => {
+            // Show a temporary loading state
+            const loadingText = document.getElementById('loading-text');
+            loadingText.style.opacity = '1';
+            
+            // Use a small delay to simulate fetching a new question
+            setTimeout(() => {
+                showRandomQuestion();
+                loadingText.style.opacity = '0';
+            }, 500); // 500ms delay
+        });
 
-            document.getElementById('next-btn').addEventListener('click', () => {
-                showRandomQuestion(questions);
-            });
+        // Initialize the game when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Display a welcome message or the first question
+            document.getElementById('question-text').textContent = "Welcome to the game! Click the button to start.";
         });
     </script>
 </body>
