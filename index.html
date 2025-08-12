@@ -84,10 +84,12 @@ Chike"></textarea>
         <label style="margin-top:12px">Starting Order (drag to reorder)</label>
         <div class="players-list" id="playersList" aria-label="Player order"></div>
 
-        <label style="margin-top:10px">Category</label>
-        <select id="categorySelect">
-          <option value="books">📖 Guess the Book of the Bible</option>
-          <option value="characters">👤 Guess the Bible Character</option>
+        <label style="margin-top:10px">Main Category</label>
+        <select id="mainCategorySelect">
+        </select>
+
+        <label style="margin-top:10px">Sub-Category</label>
+        <select id="subCategorySelect">
         </select>
 
         <label style="margin-top:10px">Number of questions per player</label>
@@ -133,93 +135,369 @@ Chike"></textarea>
    ========================= */
 const BOOKS_QUESTIONS = [
   // Emoji Puzzles
-  { clue: "🐑🕊️", hint: "Psalms (or Psalm 23 specifically)", answer: "Psalms" },
-  { clue: "🌾🍞🍷", hint: "Feeding of 5,000 & Last Supper symbolism", answer: "John / Gospels" },
-  { clue: "🔥🏔️📜", hint: "Mountain encounter; law received", answer: "Exodus" },
-  { clue: "🐺🧒🔵", hint: "Prophet, childlike faith; Jonah fits", answer: "Jonah" },
-  { clue: "🐪💰👑", hint: "Magi, gifts, worship", answer: "Matthew" },
-  { clue: "⚖️🧑‍⚖️📜", hint: "Judge, law, righteous leader", answer: "Deuteronomy / Judges" },
-  { clue: "🐍🍎🧑‍🤝‍🧑", hint: "Beginnings, the first family's trouble", answer: "Genesis" },
-  { clue: "🏹🦌🏃‍♂️", hint: "Young hunter becoming king", answer: "1 Samuel" },
-  { clue: "🕯️📖✡️", hint: "Temple, prayer, reform", answer: "Ezra" },
-  { clue: "🛶🌊😴", hint: "Storm, rest, rebuke (Jesus sleeping)", answer: "Mark / Gospels" },
-  { clue: "🕊️🩸⛪", hint: "Peace, sacrifice, new covenant imagery", answer: "Hebrews" },
-  { clue: "🏗️🧱🔔", hint: "Rebuild, call to worship", answer: "Nehemiah" },
+  { clue: "🐑🕊️", hint: "A collection of sacred songs and poems", answer: "Psalms" },
+  { clue: "🌾🍞🍷", hint: "Features stories of Jesus' miracles, including feeding thousands and the Last Supper", answer: "John / Gospels" },
+  { clue: "🔥🏔️📜", hint: "Describes the liberation of Israelites from slavery and the giving of the Law on a mountain", answer: "Exodus" },
+  { clue: "🐠➡️🚶‍♂️", hint: "This book tells the story of a prophet swallowed by a great fish and later preaching to Nineveh", answer: "Jonah" },
+  { clue: "🐪💰👑", hint: "Begins with the genealogy of Jesus and includes the story of the wise men visiting baby Jesus", answer: "Matthew" },
+  { clue: "⚖️🧑‍⚖️📜", hint: "Contains laws and speeches from Moses before the Israelites entered the Promised Land", answer: "Deuteronomy / Judges" },
+  { clue: "🐍🍎🧑‍🤝‍🧑", hint: "The first book, describing creation, the fall, and early human history", answer: "Genesis" },
+  { clue: "🏹🦌🏃‍♂️", hint: "Chronicles the life of Israel's first king and the rise of a young shepherd to kingship", answer: "1 Samuel" },
+  { clue: "🕯️📖✡️", hint: "Focuses on the return of exiles from Babylon and the rebuilding of the Temple", answer: "Ezra" },
+  { clue: "🛶🌊😴", hint: "One of the Gospels that features Jesus calming a storm while sleeping in a boat", answer: "Mark / Gospels" },
+  { clue: "🕊️🩸⛪", hint: "An epistle emphasizing Jesus as the superior high priest and the new covenant", answer: "Hebrews" },
+  { clue: "🏗️🧱🔔", hint: "Tells of the rebuilding of Jerusalem's walls after the exile", answer: "Nehemiah" },
 
   // Cryptic
-  { clue: "Short letter by fisherman who saw the resurrected", hint: "1 Peter (or 2 Peter)", answer: "1 Peter" },
-  { clue: "Its title means 'hidden' — dreams & fiery faith", hint: "Lion's den", answer: "Daniel" },
-  { clue: "Courtroom drama where the innocent are tried", hint: "Patience under trial", answer: "Job" },
-  { clue: "'Vanity!' — practical advice for living", hint: "Also called 'The Preacher'", answer: "Ecclesiastes" },
-  { clue: "Annals of kings — rise and fall", hint: "1 & 2 Chronicles", answer: "1 & 2 Chronicles" },
-  { clue: "Named after a sea creature — lament & deliverance", hint: "Nineveh involved", answer: "Jonah" },
-  { clue: "Missionary travel log by physician-historian", hint: "Sequel has shipwrecks", answer: "Luke / Acts" },
-  { clue: "Short prophetic flash vs a proud northern city", hint: "Judgment on Nineveh", answer: "Nahum" },
-  { clue: "Encouragement letter from prison", hint: "Rejoice always", answer: "Philippians" },
-  { clue: "A love poem doubling as allegory", hint: "Also Canticles", answer: "Song of Solomon" },
-  { clue: "Oracle about a vineyard; image of judgment", hint: "Major prophet", answer: "Isaiah" },
-  { clue: "Starts with genealogy; ends with empty tomb", hint: "Tax-collector's gospel", answer: "Matthew" },
+  { clue: "Short letter by fisherman who saw the resurrected", hint: "An epistle from an apostle who denied Jesus but was restored", answer: "1 Peter" },
+  { clue: "Its title means 'hidden' — dreams & fiery faith", hint: "Features visions and stories like the fiery furnace and the lion's den", answer: "Daniel" },
+  { clue: "Courtroom drama where the innocent are tried", hint: "A book that explores themes of suffering and patience through the story of a righteous man", answer: "Job" },
+  { clue: "'Vanity!' — practical advice for living", hint: "A philosophical book that reflects on the meaning of life and earthly pursuits", answer: "Ecclesiastes" },
+  { clue: "Annals of kings — rise and fall", hint: "Historical books detailing the reigns of various kings in Israel and Judah", answer: "1 & 2 Chronicles" },
+  { clue: "Named after a sea creature — lament & deliverance", hint: "This prophetic book recounts a prophet's journey to Nineveh after being swallowed by a large fish", answer: "Jonah" },
+  { clue: "Missionary travel log by physician-historian", hint: "A New Testament book narrating the early church's spread and missionary journeys", answer: "Luke / Acts" },
+  { clue: "Short prophetic flash vs a proud northern city", hint: "A minor prophet who foretold the destruction of Nineveh", answer: "Nahum" },
+  { clue: "Encouragement letter from prison", hint: "An epistle written by Paul from prison, encouraging joy and unity", answer: "Philippians" },
+  { clue: "A love poem doubling as allegory", hint: "A poetic book often interpreted as an allegory for God's love for His people", answer: "Song of Solomon" },
+  { clue: "Oracle about a vineyard; image of judgment", hint: "A major prophet known for extensive prophecies about the Messiah and judgment", answer: "Isaiah" },
+  { clue: "Starts with genealogy; ends with empty tomb", hint: "The first Gospel, beginning with Jesus' ancestry and concluding with his resurrection", answer: "Matthew" },
 
   // Riddles
-  { clue: "Opens with creation; many families, one ancestor", hint: "First book", answer: "Genesis" },
-  { clue: "Poetry for the heart — songs & laments", hint: "150 chapters", answer: "Psalms" },
-  { clue: "Laws and wandering; people's second beginning", hint: "Farewell speeches", answer: "Deuteronomy" },
-  { clue: "Short prophet naming 'the day of the Lord'", hint: "3 chapters", answer: "Joel" },
-  { clue: "Born of exile; rebuilding walls & worship", hint: "Cupbearer turned builder", answer: "Nehemiah" },
-  { clue: "Shepherd becomes king; covenant & temple plans", hint: "Samuel's writings", answer: "1 Samuel / 2 Samuel" },
-  { clue: "Logical writer tracing Jesus' teachings", hint: "Physician writer", answer: "Luke" },
-  { clue: "Courtroom poem & childless couple rejoicing", hint: "Hannah & deliverance", answer: "Judges / 1 Samuel" },
-  { clue: "Visions of beasts, horns & a little scroll", hint: "Apocalyptic seer", answer: "Daniel / Revelation" },
-  { clue: "Practical maxims; father's short advice", hint: "Wisdom literature", answer: "Proverbs" },
+  { clue: "Opens with creation; many families, one ancestor", hint: "This foundational book describes the beginning of the world and humanity", answer: "Genesis" },
+  { clue: "Poetry for the heart — songs & laments", hint: "A collection of 150 lyrical compositions for worship and reflection", answer: "Psalms" },
+  { clue: "Laws and wandering; people's second beginning", hint: "Contains Moses' farewell speeches and a reiteration of the Law before entering Canaan", answer: "Deuteronomy" },
+  { clue: "Short prophet naming 'the day of the Lord'", hint: "A minor prophet who speaks of a coming 'Day of the Lord'", answer: "Joel" },
+  { clue: "Born of exile; rebuilding walls & worship", hint: "Follows a cupbearer who leads the rebuilding of Jerusalem's walls", answer: "Nehemiah" },
+  { clue: "Shepherd becomes king; covenant & temple plans", hint: "Details the transition from the first king to a shepherd who becomes a great king", answer: "1 Samuel / 2 Samuel" },
+  { clue: "Logical writer tracing Jesus' teachings", hint: "A Gospel writer, known for his detailed historical accounts and focus on Jesus' humanity", answer: "Luke" },
+  { clue: "Courtroom poem & childless couple rejoicing", hint: "Features stories of judges and a woman who prayed for a child", answer: "Judges / 1 Samuel" },
+  { clue: "Visions of beasts, horns & a little scroll", hint: "Contains apocalyptic visions of future events and symbolic creatures", answer: "Daniel / Revelation" },
+  { clue: "Practical maxims; father's short advice", hint: "A book of wisdom literature offering guidance for living a righteous life", answer: "Proverbs" },
 
   // Mini-Scenario
-  { clue: "You kneel to wash feet at a last supper. Which book?", hint: "Unique foot-washing scene", answer: "John" },
-  { clue: "You're told to build an ark; birds prove dryness", hint: "Rainbow promise", answer: "Genesis" },
-  { clue: "A prophet is taken in a whirlwind into heaven", hint: "Fiery chariot", answer: "2 Kings" },
-  { clue: "Stone rolled away; angels at the tomb", hint: "Resurrection morning", answer: "Gospels" },
-  { clue: "Nehemiah planning a city wall — which book?", hint: "Post-exile restoration", answer: "Nehemiah" },
-  { clue: "Love letters in an ancient courtship song", hint: "Romantic allegory", answer: "Song of Solomon" },
-  { clue: "Valley of dry bones becomes warriors", hint: "Prophet in exile", answer: "Ezekiel" },
-  { clue: "A meek tax collector climbs a tree", hint: "Zacchaeus story", answer: "Luke" },
-  { clue: "A virgin told she'll bear a son: 'God with us'", hint: "Nativity prophecy", answer: "Matthew / Luke" },
-  { clue: "A prophet survives a den of predators", hint: "Royal decree gone wrong", answer: "Daniel" }
+  { clue: "You kneel to wash feet at a last supper. Which book?", hint: "This Gospel uniquely describes Jesus washing his disciples' feet", answer: "John" },
+  { clue: "You're told to build an ark; birds prove dryness", hint: "The story of a great flood and a family saved in a large boat", answer: "Genesis" },
+  { clue: "A prophet is taken in a whirlwind into heaven", hint: "Describes a prophet's miraculous ascension in a fiery chariot", answer: "2 Kings" },
+  { clue: "Stone rolled away; angels at the tomb", hint: "Accounts of Jesus' resurrection, including the empty tomb and angelic announcements", answer: "Gospels" },
+  { clue: "Nehemiah planning a city wall — which book?", hint: "A historical book about the reconstruction of Jerusalem's fortifications", answer: "Nehemiah" },
+  { clue: "Love letters in an ancient courtship song", hint: "A poetic book expressing romantic love, often interpreted allegorically", answer: "Song of Solomon" },
+  { clue: "Valley of dry bones becomes warriors", hint: "A prophetic vision of dry bones being brought back to life", answer: "Ezekiel" },
+  { clue: "A meek tax collector climbs a tree", hint: "The Gospel story of a short tax collector who wanted to see Jesus", answer: "Luke" },
+  { clue: "A virgin told she'll bear a son: 'God with us'", hint: "Narratives of the announcement of Jesus' birth to his mother", answer: "Matthew / Luke" },
+  { clue: "A prophet survives a den of predators", hint: "The account of a prophet miraculously preserved in a den of lions", answer: "Daniel" }
 ];
 
 const CHARACTER_QUESTIONS = [
-  { clue: "👨‍🌾🍎", hint: "First man in Eden", answer: "Adam" },
-  { clue: "👩‍🌾🍎", hint: "First woman in Eden", answer: "Eve" },
-  { clue: "🌧️🕊️🌈", hint: "Built an ark; rainbow promise", answer: "Noah" },
-  { clue: "🔥⭐→descendants", hint: "Father of many nations; covenant with God", answer: "Abraham" },
-  { clue: "👵➡️🎯 (barrenness then laughter)", hint: "Wife of Abraham who laughed at promise", answer: "Sarah" },
-  { clue: "🥖🥩→sacrifice", hint: "Son of Abraham who carries wood for a sacrifice", answer: "Isaac" },
-  { clue: "🧵👔🛌→dreams", hint: "Sold by brothers, later in Egypt interpreting dreams", answer: "Joseph" },
-  { clue: "🔥🌊→leader", hint: "Led Israelites out of Egypt, parted the sea", answer: "Moses" },
-  { clue: "👨‍⚖️📜→priest", hint: "Aaron was the first high priest", answer: "Aaron" },
-  { clue: "🗡️🏹→judge & judge-slayer", hint: "Israelite judge known for long hair and great strength", answer: "Samson" },
-  { clue: "🛡️👑→first king", hint: "Anointed as Israel's first king", answer: "Saul" },
-  { clue: "🏹🎵👑", hint: "Shepherd, harp player, became king after Saul", answer: "David" },
-  { clue: "🕊️⚖️👑", hint: "Wisdom, builder of the Temple, very wealthy king", answer: "Solomon" },
-  { clue: "🔥🚒—hid in cave", hint: "Challenged prophets of Baal; taken up in whirlwind", answer: "Elijah" },
-  { clue: "🧑‍⚕️✍️→historian", hint: "Wrote Gospel and Acts; a physician", answer: "Luke" },
-  { clue: "🌊🐳 (swallowed)", hint: "Prophet swallowed by a great fish", answer: "Jonah" },
-  { clue: "👰→queen (saved people)", hint: "Clever queen who saved her people in Persia", answer: "Esther" },
-  { clue: "👩‍🌾➡️loyal", hint: "Moabite who stayed with Naomi", answer: "Ruth" },
-  { clue: "✝️—teacher, miracles", hint: "Central figure of the New Testament", answer: "Jesus" },
-  { clue: "🚶‍♂️👣—denied, restored", hint: "Fisherman who denied Jesus three times, later restored", answer: "Peter" },
-  { clue: "📜✍️→missionary", hint: "Persecutor turned apostle to the Gentiles", answer: "Paul" },
-  { clue: "🧔🔔—forerunner", hint: "Baptized Jesus and called people to repentance", answer: "John the Baptist" },
-  { clue: "🪢🏙️—faithful spy", hint: "Rahab, the Canaanite who hid Israelite spies", answer: "Rahab" },
-  { clue: "🎻🎼(psalms)", hint: "Wrote many psalms, king of Israel", answer: "David" },
-  { clue: "🪓🏛️→rebuild", hint: "Cupbearer who rebuilt Jerusalem's wall", answer: "Nehemiah" },
-  { clue: "👵➡️son miracle", hint: "Hannah prayed and bore Samuel", answer: "Hannah" },
-  { clue: "⚖️⚔️→judge", hint: "Prophet and judge who anointed David", answer: "Samuel" },
-  { clue: "🧱→wisdom writer", hint: "Wrote Proverbs, son of David", answer: "Solomon" },
-  { clue: "🕶️➡️vision (apostle)", hint: "Beloved disciple, wrote Gospel and Revelation", answer: "John (the Apostle)" },
-  { clue: "🧾➡️tax collector", hint: "Climbed a tree to see Jesus", answer: "Zacchaeus" },
-  { clue: "👑➡️wise woman", hint: "Abigail — offered wise counsel", answer: "Abigail" },
-  { clue: "🇮🇱→messenger (prophet)", hint: "Weeping prophet from Jerusalem", answer: "Jeremiah" },
-  { clue: "📜→visions of dry bones", hint: "Saw the valley of dry bones", answer: "Ezekiel" }
+  { clue: "👨‍🌾🍎", hint: "The first man created, who lived in the Garden of Eden", answer: "Adam" },
+  { clue: "👩‍🌾🍎", hint: "The first woman, created from a rib, who ate the forbidden fruit", answer: "Eve" },
+  { clue: "🌧️🕊️🌈", hint: "Built an ark to save his family and animals from a great flood", answer: "Noah" },
+  { clue: "🔥⭐→descendants", hint: "Considered the father of many nations, he received a covenant from God", answer: "Abraham" },
+  { clue: "👵➡️🎯 (barrenness then laughter)", hint: "The wife of Abraham, who initially laughed at the promise of having a child in her old age", answer: "Sarah" },
+  { clue: "🥖🥩→sacrifice", hint: "The son of Abraham, whom his father was commanded to sacrifice", answer: "Isaac" },
+  { clue: "🧵�🛌→dreams", hint: "Sold into slavery by his brothers, he later rose to power in Egypt and interpreted dreams", answer: "Joseph" },
+  { clue: "🔥🌊→leader", hint: "Led the Israelites out of slavery in Egypt and parted the Red Sea", answer: "Moses" },
+  { clue: "👨‍⚖️📜→priest", hint: "The first high priest of the Israelites, brother of Moses", answer: "Aaron" },
+  { clue: "🗡️🏹→judge & judge-slayer", hint: "An Israelite judge famous for his immense strength and long hair", answer: "Samson" },
+  { clue: "🛡️👑→first king", hint: "The first king of Israel, chosen by God but later rejected for disobedience", answer: "Saul" },
+  { clue: "🏹🎵👑", hint: "A shepherd boy who became king of Israel, known for his psalms and defeating a giant", answer: "David" },
+  { clue: "🕊️⚖️👑", hint: "Known for his great wisdom and for building the first Temple in Jerusalem", answer: "Solomon" },
+  { clue: "🔥🚒—hid in cave", hint: "A powerful prophet who challenged the prophets of Baal and was taken to heaven in a whirlwind", answer: "Elijah" },
+  { clue: "🧑‍⚕️✍️→historian", hint: "A physician and Gentile writer who penned one of the Gospels and the Book of Acts", answer: "Luke" },
+  { clue: "🌊🐳 (swallowed)", hint: "A prophet commanded to go to Nineveh, who was swallowed by a large fish after fleeing", answer: "Jonah" },
+  { clue: "👰→queen (saved people)", hint: "A Jewish queen in Persia who risked her life to save her people from annihilation", answer: "Esther" },
+  { clue: "👩‍🌾➡️loyal", hint: "A Moabite woman who showed great loyalty to her mother-in-law, Naomi", answer: "Ruth" },
+  { clue: "✝️—teacher, miracles", hint: "The central figure of Christianity, known for his teachings, miracles, and resurrection", answer: "Jesus" },
+  { clue: "🚶‍♂️👣—denied, restored", hint: "One of Jesus' main disciples, who denied him three times but was later restored", answer: "Peter" },
+  { clue: "📜✍️→missionary", hint: "A former persecutor of Christians who became a prolific apostle and missionary to the Gentiles", answer: "Paul" },
+  { clue: "🧔🔔—forerunner", hint: "A prophet who prepared the way for Jesus, baptizing people in the Jordan River", answer: "John the Baptist" },
+  { clue: "🪢🏙️—faithful spy", hint: "A Canaanite woman who helped the Israelite spies in Jericho and was saved when the city fell", answer: "Rahab" },
+  { clue: "🎻🎼(psalms)", hint: "Authored many of the psalms and was the second king of Israel", answer: "David" },
+  { clue: "🪓🏛️→rebuild", hint: "A cupbearer to the Persian king who led the rebuilding of Jerusalem's walls", answer: "Nehemiah" },
+  { clue: "👵➡️son miracle", hint: "A barren woman who prayed earnestly and gave birth to the prophet Samuel", answer: "Hannah" },
+  { clue: "⚖️⚔️→judge", hint: "A prophet and judge who anointed both Saul and David as kings of Israel", answer: "Samuel" },
+  { clue: "🧱→wisdom writer", hint: "A king of Israel renowned for his wisdom and credited with writing Proverbs and Ecclesiastes", answer: "Solomon" },
+  { clue: "🕶️➡️vision (apostle)", hint: "The beloved disciple, who wrote a Gospel, epistles, and the Book of Revelation", answer: "John (the Apostle)" },
+  { clue: "🧾➡️tax collector", hint: "A chief tax collector who climbed a tree to see Jesus and later repented", answer: "Zacchaeus" },
+  { clue: "👑➡️wise woman", hint: "A wise and discerning woman who intervened to prevent David from committing revenge", answer: "Abigail" },
+  { clue: "🇮🇱→messenger (prophet)", hint: "Known as the 'weeping prophet,' he prophesied Judah's destruction and exile", answer: "Jeremiah" },
+  { clue: "📜→visions of dry bones", hint: "A prophet who had visions, including one of a valley of dry bones brought back to life", answer: "Ezekiel" }
 ];
+
+const TECH_QUESTIONS = [
+  { clue: "☁️💾", hint: "Storing data online rather than on a local device, accessible from anywhere", answer: "Cloud Storage" },
+  { clue: "🐍💻", hint: "A versatile and popular programming language often used for web development, data analysis, and AI, named after a British comedy troupe", answer: "Python" },
+  { clue: "📱🍎", hint: "Apple's flagship smartphone, renowned for its design and ecosystem", answer: "iPhone" },
+  { clue: "🐳📦", hint: "A platform for developers to build, share, and run applications using lightweight, portable units called containers", answer: "Docker" },
+  { clue: "👓🌐", hint: "Wearable technology that overlays digital information onto the real world, enhancing perception", answer: "Smart Glasses" },
+  { clue: "⚙️📜", hint: "A sequence of instructions designed to automate repetitive tasks or processes on a computer", answer: "Automation Script" },
+  { clue: "🔍🌐", hint: "The world's most widely used search engine, an essential tool for finding information online", answer: "Google" },
+  { clue: "🛡️🔑", hint: "A security measure that requires users to provide two different forms of identification before gaining access", answer: "Two-Factor Authentication" },
+  { clue: "🧠🤖", hint: "The broad field of computer science focused on creating machines that can perform tasks normally requiring human intelligence", answer: "Artificial Intelligence" },
+  { clue: "🌐💻", hint: "A global system of interconnected computer networks that uses standard communication protocols to serve billions of users", answer: "Internet" },
+  { clue: "🔗🧱", hint: "A decentralized, distributed ledger technology that underlies cryptocurrencies like Bitcoin", answer: "Blockchain" },
+  { clue: "🎮👓", hint: "Technology that creates a simulated environment, immersing the user in a virtual world", answer: "Virtual Reality (VR)" },
+  { clue: "💾💿", hint: "A portable storage device that uses flash memory to store data, replacing older floppy disks and CDs", answer: "USB Drive" },
+  { clue: "📡📶", hint: "A technology that allows devices to connect to a network wirelessly, commonly found in homes and public places", answer: "Wi-Fi" },
+  { clue: "🗣️📱", hint: "Software that understands and responds to voice commands, found in smartphones and smart speakers", answer: "Voice Assistant" },
+  { clue: "🔋⚡", hint: "The ability of a device to operate without being plugged into a power source, crucial for mobile devices", answer: "Battery Life" },
+  { clue: "🛒🛍️", hint: "The process of buying and selling goods or services over the internet", answer: "E-commerce" },
+  { clue: "📈📊", hint: "The practice of collecting, processing, and analyzing large datasets to extract insights and inform decisions", answer: "Big Data" },
+  { clue: "🏠💡", hint: "A system of interconnected devices and appliances that can be controlled remotely via the internet", answer: "Smart Home" },
+  { clue: "🚀🌌", hint: "The privately funded industry focused on space exploration and commercial space activities", answer: "New Space" }
+];
+
+const COUNTRY_QUESTIONS = [
+  { clue: "🗼🍣", hint: "An island nation known for its cherry blossoms, sushi, and ancient traditions", answer: "Japan" },
+  { clue: "🦘🏄‍♂️", hint: "A vast continent and country famous for its unique wildlife and surfing beaches", answer: "Australia" },
+  { clue: "🍕🍝", hint: "A European country shaped like a boot, famous for its pasta, pizza, and historical sites", answer: "Italy" },
+  { clue: "🏰🍺", hint: "Known for its historical castles, beer festivals like Oktoberfest, and engineering", answer: "Germany" },
+  { clue: "🕌🐪", hint: "A desert kingdom in the Middle East, home to holy cities of Islam", answer: "Saudi Arabia" },
+  { clue: "🦁🏝️", hint: "A large island nation off the southeast coast of Africa, known for lemurs", answer: "Madagascar" },
+  { clue: "🥨⛷️", hint: "An alpine nation famous for its precision watches, chocolates, and neutrality", answer: "Switzerland" },
+  { clue: "🎭⚽", hint: "A South American country known for its vibrant carnival celebrations and football passion", answer: "Brazil" },
+  { clue: "🗽🍔", hint: "A North American country known for its diverse landscapes, iconic landmarks, and fast food culture", answer: "USA" },
+  { clue: "🥷🍵", hint: "The land of samurai, beautiful tea ceremonies, and modern technology", answer: "Japan" },
+  { clue: "🍁🏒", hint: "North American country famous for maple syrup and ice hockey", answer: "Canada" },
+  { clue: " pyramides 🇪🇬", hint: "Ancient civilization known for its pharaohs and massive desert structures", answer: "Egypt" },
+  { clue: "🐘🌶️", hint: "A South Asian country known for its vibrant spices, diverse cultures, and large population", answer: "India" },
+  { clue: "🍷🥖", hint: "European country famous for its fine wines, cheeses, and the Eiffel Tower", answer: "France" },
+  { clue: "🐉万里", hint: "East Asian country with a rich history, known for the Great Wall and dragons", answer: "China" },
+  { clue: "🇬🇧👑", hint: "An island nation, home to the Royal Family and famous for its historical landmarks", answer: "United Kingdom" },
+  { clue: "❄️🌲", hint: "A large Northern European country known for its cold winters, vast forests, and unique folklore", answer: "Finland" },
+  { clue: "🇳🇿🐑", hint: "An island nation in the Pacific Ocean, famous for its stunning natural landscapes and sheep farming", answer: "New Zealand" },
+  { clue: "🇷🇺🐻", hint: "The world's largest country by land area, spanning Eastern Europe and Northern Asia", answer: "Russia" },
+  { clue: "🇦🇷💃", hint: "A South American country known for its tango music and dance, and vast plains", answer: "Argentina" }
+];
+
+const POPCULTURE_QUESTIONS = [
+  { clue: "⚡🧙‍♂️", hint: "A British orphan discovers he is a wizard and attends Hogwarts School of Witchcraft and Wizardry", answer: "Harry Potter" },
+  { clue: "🦸‍♂️🛡️🇺🇸", hint: "A super-soldier from WWII who wields an indestructible shield and fights for justice", answer: "Captain America" },
+  { clue: "👽📞🏠", hint: "A gentle alien stranded on Earth befriends a young boy and seeks to return to his home planet", answer: "E.T." },
+  { clue: "🎮🍄", hint: "A popular Italian plumber video game character who rescues a princess in the Mushroom Kingdom", answer: "Mario" },
+  { clue: "🧊👑", hint: "A Disney queen with magical powers to control ice and snow, whose kingdom is perpetually frozen", answer: "Elsa (Frozen)" },
+  { clue: "🦖🏝️", hint: "A theme park where dinosaurs are brought back to life through cloning, leading to disastrous consequences", answer: "Jurassic Park" },
+  { clue: "🎤👑", hint: "A legendary British rock band fronted by Freddie Mercury, known for their elaborate stage shows and anthemic songs", answer: "Queen" },
+  { clue: "🛡️⚔️🐉", hint: "An epic fantasy television series about noble families battling for control of a fictional continent's Iron Throne", answer: "Game of Thrones" },
+  { clue: "🚗💨💨", hint: "A long-running film franchise centered around street racing, heists, and themes of family loyalty", answer: "Fast & Furious" },
+  { clue: "👩‍🚀🌌", hint: "An epic space opera saga involving a galaxy far, far away and the perennial struggle between the Jedi and the Sith", answer: "Star Wars" },
+  { clue: "🕸️🕷️", hint: "A popular superhero known for his arachnid-like abilities and web-slinging across New York City", answer: "Spider-Man" },
+  { clue: " detect 🕵️‍♀️", hint: "A fictional detective with extraordinary powers of observation and deduction, often accompanied by his loyal friend Dr. Watson", answer: "Sherlock Holmes" },
+  { clue: " yellow 🟡 family 👨‍👩‍👧‍👦", hint: "A long-running animated sitcom about a dysfunctional, yellow-skinned family and their life in Springfield", answer: "The Simpsons" },
+  { clue: " magic ✨ castle 🏰", hint: "A magical theme park created by Walt Disney, known for its iconic castle and beloved characters", answer: "Disneyland" },
+  { clue: " zombie 🧟‍♀️ walk 🚶", hint: "A post-apocalyptic horror TV series about survivors navigating a world overrun by the undead", answer: "The Walking Dead" },
+  { clue: " bat 🦇 signal 🔦", hint: "A dark knight superhero who protects Gotham City using advanced gadgets and martial arts skills", answer: "Batman" },
+  { clue: " blue 🔵 box 📦", hint: "A British science fiction TV show about a Time Lord who travels through time and space in a police box-shaped spaceship", answer: "Doctor Who" },
+  { clue: " wizard 🧙‍♂️ of Oz 🌈", hint: "A classic musical film about a young girl transported to a magical land, accompanied by a scarecrow, tin man, and cowardly lion", answer: "The Wizard of Oz" },
+  { clue: " superhero 💪 team 🦸‍♂️", hint: "A team of superheroes from the Marvel Comics universe who unite to fight powerful threats", answer: "The Avengers" },
+  { clue: " spy 🕵️‍♂️ licence 🍸", hint: "A British Secret Service agent known for his sophisticated gadgets, smooth demeanor, and signature shaken martini", answer: "James Bond" }
+];
+
+const FOOD_QUESTIONS = [
+  { clue: "🍔🍟🥤", hint: "A classic combination often found at fast-food restaurants for a quick meal", answer: "Burger Meal" },
+  { clue: "🍣🥢", hint: "A traditional Japanese dish consisting of vinegared rice, seafood, and vegetables, often served raw", answer: "Sushi" },
+  { clue: "🌮🇲🇽", hint: "A traditional Mexican dish made of a corn or wheat tortilla folded or rolled around a filling, popular for its vibrant flavors", answer: "Taco" },
+  { clue: "🥐☕", hint: "A popular French breakfast pairing of a buttery, flaky pastry and a hot beverage, often enjoyed in cafes", answer: "Croissant and Coffee" },
+  { clue: "🍫🍓", hint: "Fresh fruit covered in a sweet, melted confection, often served as a romantic dessert or treat", answer: "Chocolate-Covered Strawberries" },
+  { clue: "🍜🥟", hint: "A Japanese noodle soup dish, served with various toppings like sliced pork, seaweed, and eggs, known for its rich broth", answer: "Ramen" },
+  { clue: "🍕🧀", hint: "A savory dish of Italian origin, consisting of a round, flattened base of dough topped with tomatoes, cheese, and often various other ingredients, baked in an oven", answer: "Pizza" },
+  { clue: "🥗🥒", hint: "A healthy dish consisting of mixed green vegetables, often with other ingredients like fruits, nuts, or meat, typically served cold with dressing", answer: "Salad" },
+  { clue: "🍦🍪", hint: "A dessert made by placing a scoop of frozen dessert between two biscuits or cookies, creating a sweet handheld treat", answer: "Ice Cream Sandwich" },
+  { clue: "🍋🥤", hint: "A sweet and sour beverage made from lemon juice, sugar, and water, often served cold and refreshing in summer", answer: "Lemonade" },
+  { clue: "🌶️🥘", hint: "A spicy stew, often containing meat, beans, and chili peppers, popular in Tex-Mex cuisine", answer: "Chili" },
+  { clue: "🧇🥞", hint: "A breakfast food made from batter or dough cooked between two plates, often served with syrup and fruit", answer: "Waffles / Pancakes" },
+  { clue: "🥖🧀", hint: "A classic French pairing, often served as an appetizer or light meal", answer: "Bread and Cheese" },
+  { clue: "🍩☕", hint: "A popular fried dough confection, often sweet and glazed, paired with a hot morning beverage", answer: "Doughnut and Coffee" },
+  { clue: "🍣🍚", hint: "A staple Asian food, the foundation of many meals, often served steamed or boiled", answer: "Rice" },
+  { clue: "🥔🍟", hint: "Thin strips of potato, deep-fried until crispy, a common side dish in fast food", answer: "French Fries" },
+  { clue: "🍗🌶️", hint: "Chicken pieces coated in a spicy batter and deep-fried, a popular comfort food", answer: "Fried Chicken" },
+  { clue: "🍰🎂", hint: "A sweet baked dessert, often decorated and served at celebrations", answer: "Cake" },
+  { clue: "🍇🍷", hint: "Fermented fruit juice, an alcoholic beverage often enjoyed with meals", answer: "Wine" },
+  { clue: "🍜🍜", hint: "Quick-cooking dried noodles, often sold in individual packets with seasoning", answer: "Instant Noodles" }
+];
+
+const MOVIE_QUESTIONS = [
+  { clue: "🦁👑", hint: "An animated classic set in the African savanna about a young lion's journey to claim his destiny", answer: "The Lion King" },
+  { clue: "🤖👽", hint: "A sci-fi action film about a cyborg assassin sent from the future to kill a woman whose son will save humanity", answer: "The Terminator" },
+  { clue: "🧙‍♂️💍", hint: "An epic fantasy adventure where a hobbit embarks on a perilous quest to destroy a powerful, corrupting ring", answer: "The Lord of the Rings" },
+  { clue: "🦇🌃", hint: "A superhero film featuring a dark, brooding vigilante protecting a crime-ridden city from villains", answer: "The Dark Knight" },
+  { clue: "🚢🧊💔", hint: "A dramatic romance set against the backdrop of a catastrophic maiden voyage of a luxurious ocean liner in the early 20th century", answer: "Titanic" },
+  { clue: "🕷️🕸️🏙️", hint: "A superhero origin story about a teenager who gains extraordinary abilities after being bitten by a radioactive arachnid", answer: "Spider-Man" },
+  { clue: "🍝 Godfather 🔫", hint: "A powerful crime drama revolving around an aging patriarch of a powerful Italian-American crime family and his successor", answer: "The Godfather" },
+  { clue: "👻🚫", hint: "A comedy about a team of eccentric scientists who start a business catching supernatural apparitions in New York City", answer: "Ghostbusters" },
+  { clue: "🚀🌌🌠", hint: "A landmark space opera that introduces iconic characters and a sweeping conflict between a heroic rebellion and an evil empire", answer: "Star Wars" },
+  { clue: "🧸🐻", hint: "A beloved bear who loves honey and has gentle adventures with his friends in the Hundred Acre Wood", answer: "Winnie the Pooh" },
+  { clue: "🏎️💨⚡", hint: "A Pixar animated film about a rookie race car eager to win the Piston Cup", answer: "Cars" },
+  { clue: "🧜‍♀️🧜‍♂️", hint: "A Disney animated musical about a young mermaid princess who longs to be human", answer: "The Little Mermaid" },
+  { clue: "🎄🎅🎁", hint: "A classic Christmas film about a man who learns the true meaning of the holiday from three spirits", answer: "A Christmas Carol" },
+  { clue: "🕵️‍♂️🎩", hint: "A famous spy known for his gadgets, elegant suits, and catchphrases like 'shaken, not stirred'", answer: "James Bond" },
+  { clue: "🧙‍♀️👠", hint: "A young girl is transported to a magical land of Munchkins and flying monkeys, following the Yellow Brick Road", answer: "The Wizard of Oz" },
+  { clue: "🚢🏴‍☠️", hint: "A swashbuckling adventure film series about a quirky pirate captain and his crew", answer: "Pirates of the Caribbean" },
+  { clue: "🦖🦕", hint: "A groundbreaking sci-fi adventure where scientists clone dinosaurs for a theme park that goes terribly wrong", answer: "Jurassic Park" },
+  { clue: "🐼🥋", hint: "An animated film about a clumsy panda who dreams of becoming a kung fu master", answer: "Kung Fu Panda" },
+  { clue: "👽🚲🌕", hint: "A young boy befriends an extraterrestrial being and helps him return to his home planet", answer: "E.T. the Extra-Terrestrial" },
+  { clue: "🥕🐰", hint: "A classic animated character known for his mischievous nature and a fondness for a certain vegetable", answer: "Bugs Bunny" }
+];
+
+const ANIMAL_QUESTIONS = [
+  { clue: "🐘🌿", hint: "The largest land mammal, known for its long trunk and tusks, often found in Africa and Asia", answer: "Elephant" },
+  { clue: "🦒📏", hint: "The tallest living terrestrial animal, characterized by its extremely long neck and legs, native to Africa", answer: "Giraffe" },
+  { clue: "🐧❄️", hint: "A flightless bird primarily found in the Southern Hemisphere, adapted for life in the water and known for its waddling walk", answer: "Penguin" },
+  { clue: "🐅 stripes", hint: "A large carnivorous feline, easily recognized by its distinctive black stripes on orange fur, a powerful hunter", answer: "Tiger" },
+  { clue: "🐬🌊", hint: "A highly intelligent marine mammal known for its playful behavior, echolocation, and often seen leaping out of water", answer: "Dolphin" },
+  { clue: "🦉🌙", hint: "A nocturnal bird of prey with large, forward-facing eyes and a distinctive hoot, known for its silent flight", answer: "Owl" },
+  { clue: "🐒🍌", hint: "A primate known for its agility in trees and a diet often including fruit, especially tropical ones", answer: "Monkey" },
+  { clue: "🐍🌳", hint: "A legless reptile that moves by slithering, some species of which are venomous, found in diverse habitats", answer: "Snake" },
+  { clue: "🐻🍯", hint: "A large omnivorous mammal, often associated with forests, hibernation, and a love for sweet treats like honey", answer: "Bear" },
+  { clue: "🦊 cunning", hint: "A small to medium-sized carnivorous mammal belonging to the dog family, known for its slyness and bushy tail", answer: "Fox" },
+  { clue: "🐴🐎", hint: "A domesticated hoofed mammal, often used for riding, racing, or farm work", answer: "Horse" },
+  { clue: "🐱🐈", hint: "A small domesticated carnivorous mammal with soft fur, a short snout, and retractable claws, popular as a pet", answer: "Cat" },
+  { clue: "🐶🐕", hint: "A domesticated carnivorous mammal, widely kept as a pet or for work purposes, known for loyalty", answer: "Dog" },
+  { clue: "🐝🍯", hint: "A stinging winged insect known for producing honey and beeswax, and its role in pollination", answer: "Bee" },
+  { clue: "🦋🌸", hint: "An insect with large, often brightly colored wings, that develops from a caterpillar", answer: "Butterfly" },
+  { clue: "🐠🐡", hint: "A cold-blooded aquatic vertebrate with gills and fins, living in water", answer: "Fish" },
+  { clue: "🕷️🕸️", hint: "An eight-legged arachnid known for spinning webs to catch prey", answer: "Spider" },
+  { clue: "🐦🕊️", hint: "A warm-blooded egg-laying vertebrate distinguished by the possession of feathers, wings, and a beak", answer: "Bird" },
+  { clue: "🐊🐊", hint: "A large, semi-aquatic reptile with a powerful tail and jaws, native to tropical regions", answer: "Crocodile" },
+  { clue: "🐢🐢", hint: "A slow-moving reptile encased in a bony shell, found in various habitats from land to sea", answer: "Turtle" }
+];
+
+const SPORTS_QUESTIONS = [
+  { clue: "⚽🥅", hint: "A team sport played with a spherical ball between two teams of 11 players; the objective is to score by getting the ball into the opposing goal", answer: "Soccer (Football)" },
+  { clue: "🏀⛹️‍♂️", hint: "A team sport in which two teams, most commonly of five players each, opposing one another on a rectangular court, compete with the primary objective of shooting a basketball through the opponent's hoop", answer: "Basketball" },
+  { clue: "🏈🏟️", hint: "A team sport played by two teams of eleven players on a rectangular field with goalposts at each end; the offensive team attempts to advance an oval ball down the field", answer: "American Football" },
+  { clue: "⚾🧤", hint: "A bat-and-ball game played between two opposing teams who take turns batting and fielding, with the objective of scoring runs by hitting a pitched ball and advancing around a series of bases", answer: "Baseball" },
+  { clue: "🎾 court", hint: "A racket sport played between two players or two teams of two players on a rectangular court divided by a net, where players use a racket to hit a ball over the net", answer: "Tennis" },
+  { clue: "🏊‍♂️🌊", hint: "The activity of propelling oneself through water using the limbs, either as a sport, recreation, or survival skill", answer: "Swimming" },
+  { clue: "🏃‍♂️💨", hint: "A group of sports that involve competitive running, jumping, throwing, and walking, often held on a track and field stadium", answer: "Track and Field" },
+  { clue: "🥊👊", hint: "A combat sport in which two people, usually wearing protective gloves, throw punches at each other for a predetermined amount of time in a boxing ring", answer: "Boxing" },
+  { clue: "⛳🏌️‍♂️", hint: "A club-and-ball sport in which players use various clubs to hit a small ball into a series of holes on a course in as few strokes as possible", answer: "Golf" },
+  { clue: "🏏 wicket", hint: "A bat-and-ball game played between two teams of eleven players on an oval field, with a wicket at each end; popular in countries like India, Australia, and England", answer: "Cricket" },
+  { clue: "🥋🥋", hint: "A combat sport and martial art originating from Japan, focusing on throws, grappling, and joint locks", answer: "Judo" },
+  { clue: "⛸️❄️", hint: "A winter sport where individuals or pairs perform spins, jumps, and intricate footwork on ice", answer: "Figure Skating" },
+  { clue: "🚲🚴‍♀️", hint: "A sport involving riding bicycles, either competitively on roads, tracks, or off-road trails", answer: "Cycling" },
+  { clue: "🏹🎯", hint: "The sport, practice, or skill of shooting with a bow and arrows", answer: "Archery" },
+  { clue: "⛷️🏔️", hint: "A winter sport involving gliding over snow on skis, either recreationally or competitively", answer: "Skiing" },
+  { clue: "🚣‍♂️🌊", hint: "The activity of propelling a boat using oars or paddles, either for sport or recreation", answer: "Rowing" },
+  { clue: "🤺🤺", hint: "The sport of fighting with swords (foil, épée, or sabre), conducted according to a set of rules", answer: "Fencing" },
+  { clue: "🏐🏐", hint: "A team sport in which two teams of six players are separated by a net, with the objective of grounding a ball on the opposing side's court", answer: "Volleyball" },
+  { clue: "🏓🏓", hint: "A racket sport played by two or four players hitting a lightweight ball back and forth across a table divided by a net", answer: "Table Tennis (Ping Pong)" },
+  { clue: "🤸‍♀️🤸‍♂️", hint: "A sport involving the performance of exercises requiring physical strength, flexibility, agility, coordination, and balance", answer: "Gymnastics" }
+];
+
+// New categories for history and books
+const HISTORY_QUESTIONS = [
+    { clue: "👑🇬🇧⚔️", hint: "A famous English king who signed the Magna Carta and was involved in the Crusades", answer: "King John" },
+    { clue: "🗽📜", hint: "The primary author of the Declaration of Independence and third U.S. President", answer: "Thomas Jefferson" },
+    { clue: "🚂💨", hint: "The invention that revolutionized transportation and industry in the 18th and 19th centuries", answer: "Steam Engine" },
+    { clue: "⚔️🛡️🐎", hint: "Medieval warriors, often associated with codes of chivalry and loyalty", answer: "Knights" },
+    { clue: "🧱🏛️", hint: "An ancient civilization known for its pyramids, pharaohs, and hieroglyphs", answer: "Ancient Egypt" },
+    { clue: "🌑👨‍🚀", hint: "The first person to walk on the moon in 1969", answer: "Neil Armstrong" },
+    { clue: "🎨🇮🇹", hint: "A famous Italian Renaissance artist, inventor, and scientist, known for the Mona Lisa", answer: "Leonardo da Vinci" },
+    { clue: "🗺️🧭", hint: "A period of European global exploration and colonial expansion from the 15th to 18th centuries", answer: "Age of Discovery" },
+    { clue: "🏰🇫🇷", hint: "A famous French queen, known for her extravagant lifestyle and eventual execution during the revolution", answer: "Marie Antoinette" },
+    { clue: "💡⚡", hint: "An American inventor and businessman who developed the phonograph, motion picture camera, and practical electric light bulb", answer: "Thomas Edison" },
+    { clue: "🏛️🏛️", hint: "The ancient civilization that gave us democracy, philosophy, and the Olympic Games", answer: "Ancient Greece" },
+    { clue: "🧱🛡️", hint: "A fortified wall built across northern Great Britain by the Roman Empire to defend against barbarian tribes", answer: "Hadrian's Wall" },
+    { clue: "📜🖋️", hint: "The year the Declaration of Independence was signed, marking American independence", answer: "1776" },
+    { clue: "🚢🧊", hint: "The infamous ocean liner that sank on its maiden voyage in 1912 after hitting an iceberg", answer: "Titanic" },
+    { clue: "👩‍🔬☢️", hint: "A pioneering female scientist who conducted groundbreaking research on radioactivity and won two Nobel Prizes", answer: "Marie Curie" },
+    { clue: "🔫💥", hint: "The assassination of Archduke Franz Ferdinand sparked the beginning of this global conflict", answer: "World War I" },
+    { clue: "👨‍🚀🚀", hint: "The space race between the USA and USSR saw the first human enter orbit; who was it?", answer: "Yuri Gagarin" },
+    { clue: "🎭🇬🇷", hint: "Ancient Greek playwright known for tragedies like 'Oedipus Rex'", answer: "Sophocles" },
+    { clue: "🌉🌉", hint: "The famous battle in London in 1066 that reshaped English history", answer: "Battle of Hastings" },
+    { clue: "🌍🌐", hint: "The historical event of 1492 that marked the arrival of Europeans in the Americas", answer: "Columbus's Voyage" }
+];
+
+const GENERAL_BOOKS_QUESTIONS = [
+    { clue: "🧙‍♂️📖", hint: "A boy wizard discovers a magical world and battles a dark lord", answer: "Harry Potter series" },
+    { clue: "🌳🕰️", hint: "A series about four siblings who discover a magical land through a wardrobe", answer: "The Chronicles of Narnia" },
+    { clue: "🐉🔥", hint: "An epic fantasy series about dragons, warring houses, and a quest for power", answer: "A Song of Ice and Fire (Game of Thrones)" },
+    { clue: "⛵️🏝️", hint: "The adventures of a sailor shipwrecked on a deserted island for 28 years", answer: "Robinson Crusoe" },
+    { clue: "🕰️🕰️", hint: "A classic dystopian novel depicting a totalitarian society where 'Big Brother' is always watching", answer: "Nineteen Eighty-Four" },
+    { clue: "🕵️‍♂️🎩", hint: "A famous consulting detective known for his brilliant deductions and living at 221B Baker Street", answer: "Sherlock Holmes series" },
+    { clue: "🚀🌌", hint: "A science fiction epic about a spice planet and political intrigue across the galaxy", answer: "Dune" },
+    { clue: "👻🔔", hint: "A classic novella about a curmudgeonly miser visited by four spirits on Christmas Eve", answer: "A Christmas Carol" },
+    { clue: "🧛‍♂️⚰️", hint: "An epistolary novel about a vampire's attempt to move from Transylvania to England and a small group's attempt to stop him", answer: "Dracula" },
+    { clue: "🎩🐇", hint: "A girl falls down a rabbit hole into a fantastical world populated by peculiar creatures", answer: "Alice in Wonderland" },
+    { clue: "👧🍎", hint: "A classic children's story about a young orphan girl with red hair and a vivid imagination", answer: "Anne of Green Gables" },
+    { clue: "💰🐳", hint: "The obsessive quest of Captain Ahab to hunt a white whale", answer: "Moby Dick" },
+    { clue: "🐸👦", hint: "A young prince encounters a stranded aviator and shares his profound observations on life and humanity", answer: "The Little Prince" },
+    { clue: "🚢🏝️", hint: "A group of British schoolboys are stranded on an uninhabited island and attempt to govern themselves", answer: "Lord of the Flies" },
+    { clue: "👽 invading", hint: "A classic science fiction novel about an alien invasion of Earth from Mars", answer: "The War of the Worlds" },
+    { clue: "💊🔴🔵", hint: "A philosophical journey into identity and reality within a simulated world", answer: "The Matrix (though primarily a film, it's inspired by philosophy)" },
+    { clue: "🐛🍎", hint: "A very hungry creature eats its way through many foods before transforming into a butterfly", answer: "The Very Hungry Caterpillar" },
+    { clue: "⚖️🇺🇸", hint: "A novel set in the American South during the Great Depression, dealing with racial injustice and moral growth", answer: "To Kill a Mockingbird" },
+    { clue: "🦊🌾", hint: "A classic children's novel about the friendship between a pig and a spider", answer: "Charlotte's Web" },
+    { clue: "📚✨", hint: "A young girl uses her love of reading to escape a difficult home life and finds a magical way to interact with stories", answer: "Matilda" }
+];
+
+/* =========================
+   CATEGORY STRUCTURE
+   ========================= */
+const ALL_CATEGORIES = {
+  'christian': {
+    name: 'Christian / Bible',
+    subcategories: {
+      'books': { name: '📖 Guess the Book of the Bible', questions: BOOKS_QUESTIONS },
+      'characters': { name: '👤 Guess the Bible Character', questions: CHARACTER_QUESTIONS }
+    }
+  },
+  'tech': {
+    name: 'Tech',
+    subcategories: {
+      'tech-terms': { name: '💻 Guess the Tech Term', questions: TECH_QUESTIONS }
+    }
+  },
+  'geography': {
+    name: 'Geography',
+    subcategories: {
+      'countries': { name: '🌍 Guess the Country', questions: COUNTRY_QUESTIONS }
+    }
+  },
+  'popculture': {
+    name: 'Pop Culture',
+    subcategories: {
+      'popculture-general': { name: '🌟 Guess the Pop Culture', questions: POPCULTURE_QUESTIONS }
+    }
+  },
+  'food': {
+    name: 'Food & Drink',
+    subcategories: {
+      'food-general': { name: '🍔 Guess the Food', questions: FOOD_QUESTIONS }
+    }
+  },
+  'movies': {
+    name: 'Movies',
+    subcategories: {
+      'movie-titles': { name: '🎬 Guess the Movie Title', questions: MOVIE_QUESTIONS }
+    }
+  },
+  'animals': {
+    name: 'Animals',
+    subcategories: {
+      'animal-names': { name: '🐾 Guess the Animal', questions: ANIMAL_QUESTIONS }
+    }
+  },
+  'sports': {
+    name: 'Sports',
+    subcategories: {
+      'sport-names': { name: '🏅 Guess the Sport', questions: SPORTS_QUESTIONS }
+    }
+  },
+  'history': {
+    name: 'History',
+    subcategories: {
+      'history-general': { name: '📜 Guess the History Fact', questions: HISTORY_QUESTIONS }
+    }
+  },
+  'books': { // Renamed from 'general-books' to simply 'books' for clarity in the top level dropdown
+    name: 'Books',
+    subcategories: {
+      'general-books-titles': { name: '📚 Guess the Book Title', questions: GENERAL_BOOKS_QUESTIONS }
+    }
+  }
+};
+
 
 /* =========================
    PERSISTENCE & STATE
@@ -239,7 +517,8 @@ let state = {
   currentPlayerIndex: 0,
   currentQuestion: null,
   countdown: 0,
-  category: 'books',
+  mainCategory: 'christian', // New: stores the main category key
+  subCategory: 'books',     // New: stores the sub-category key
   timeBeforeHint: 5,
   timeAfterHint: 5
 };
@@ -251,7 +530,8 @@ const playersList = document.getElementById('playersList');
 const numQuestionsInput = document.getElementById('numQuestions');
 const startBtn = document.getElementById('startBtn');
 const resumeBtn = document.getElementById('resumeBtn');
-const categorySelect = document.getElementById('categorySelect');
+const mainCategorySelect = document.getElementById('mainCategorySelect'); // Changed ID
+const subCategorySelect = document.getElementById('subCategorySelect'); // New element
 const timeBeforeHintInput = document.getElementById('timeBeforeHint');
 const timeAfterHintInput = document.getElementById('timeAfterHint');
 const clearStorageBtn = document.getElementById('clearStorageBtn');
@@ -267,7 +547,15 @@ let tickInterval = null;
    UTILITIES
    ========================= */
 function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; }
-function cloneDeckForCategory(cat){ return (cat==='books' ? BOOKS_QUESTIONS : CHARACTER_QUESTIONS).map(q=>({...q})); }
+// Function to select the correct question deck based on category and sub-category
+function cloneDeckForCategory(mainCatKey, subCatKey){
+  const mainCat = ALL_CATEGORIES[mainCatKey];
+  if (mainCat && mainCat.subcategories[subCatKey]) {
+    return mainCat.subcategories[subCatKey].questions.map(q=>({...q}));
+  }
+  // Fallback to default if category or subcategory is not found
+  return ALL_CATEGORIES['christian'].subcategories['books'].questions.map(q=>({...q}));
+}
 function persist(){ saveState(state); }
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m])); }
 
@@ -322,6 +610,62 @@ function getDragAfterElement(container, y){
 }
 
 /* =========================
+   CATEGORY SELECTION LOGIC
+   ========================= */
+function populateMainCategories() {
+  mainCategorySelect.innerHTML = '';
+  for (const key in ALL_CATEGORIES) {
+    const option = document.createElement('option');
+    option.value = key;
+    option.textContent = ALL_CATEGORIES[key].name;
+    mainCategorySelect.appendChild(option);
+  }
+  // Set initial selection
+  mainCategorySelect.value = state.mainCategory;
+  populateSubCategories(); // Populate sub-categories based on initial main category
+}
+
+function populateSubCategories() {
+  subCategorySelect.innerHTML = '';
+  const selectedMainCategoryKey = mainCategorySelect.value;
+  const subCats = ALL_CATEGORIES[selectedMainCategoryKey]?.subcategories;
+
+  if (subCats) {
+    for (const key in subCats) {
+      const option = document.createElement('option');
+      option.value = key;
+      option.textContent = subCats[key].name;
+      subCategorySelect.appendChild(option);
+    }
+  }
+  // Set initial selection, or fallback to first available
+  if (state.subCategory && subCats && subCats[state.subCategory]) {
+      subCategorySelect.value = state.subCategory;
+  } else if (subCats) {
+      // If the previously selected subCategory isn't in the new main category, select the first one
+      const firstSubCatKey = Object.keys(subCats)[0];
+      if (firstSubCatKey) {
+          subCategorySelect.value = firstSubCatKey;
+          state.subCategory = firstSubCatKey; // Update state
+      }
+  }
+}
+
+mainCategorySelect.addEventListener('change', () => {
+  state.mainCategory = mainCategorySelect.value;
+  populateSubCategories();
+  // Update state.subCategory to the newly selected first sub-category (or whatever is default)
+  state.subCategory = subCategorySelect.value;
+  persist();
+});
+
+subCategorySelect.addEventListener('change', () => {
+  state.subCategory = subCategorySelect.value;
+  persist();
+});
+
+
+/* =========================
    SETUP HANDLERS
    ========================= */
 loadPlayersBtn.addEventListener('click', ()=>{
@@ -340,11 +684,12 @@ startBtn.addEventListener('click', ()=> {
   const n = parseInt(numQuestionsInput.value) || 0;
   if(n <= 0){ alert('Enter valid number of questions'); return; }
   state.questionsPerPlayer = n;
-  state.category = categorySelect.value;
+  state.mainCategory = mainCategorySelect.value; // Store main category
+  state.subCategory = subCategorySelect.value;   // Store sub category
   state.timeBeforeHint = Math.max(1, parseInt(timeBeforeHintInput.value) || 5);
   state.timeAfterHint = Math.max(1, parseInt(timeAfterHintInput.value) || 5);
   // build deck (shuffled)
-  state.deck = shuffle(cloneDeckForCategory(state.category));
+  state.deck = shuffle(cloneDeckForCategory(state.mainCategory, state.subCategory));
   // reset counters for new round
   state.usedCountThisPlayer = 0;
   state.currentPlayerIndex = 0;
@@ -363,10 +708,16 @@ resumeBtn.addEventListener('click', ()=> {
   state = Object.assign(state, saved);
   // update inputs
   namesInput.value = state.players.join('\n');
-  categorySelect.value = state.category || 'books';
   numQuestionsInput.value = state.questionsPerPlayer || 6;
   timeBeforeHintInput.value = state.timeBeforeHint || 5;
   timeAfterHintInput.value = state.timeAfterHint || 5;
+
+  // Restore main and sub-category selections
+  populateMainCategories();
+  mainCategorySelect.value = state.mainCategory;
+  populateSubCategories();
+  subCategorySelect.value = state.subCategory;
+
   renderPlayers();
   renderGame();
   if(state.phase === 'playing'){
@@ -381,12 +732,16 @@ clearStorageBtn.addEventListener('click', ()=> {
   state = {
     phase:'setup', players:[], scores:{}, deck:[], usedCountThisPlayer:0,
     questionsPerPlayer:6, currentPlayerIndex:0, currentQuestion:null, countdown:0,
-    category:'books', timeBeforeHint:5, timeAfterHint:5
+    mainCategory:'christian', subCategory:'books', timeBeforeHint:5, timeAfterHint:5
   };
   namesInput.value = '';
   numQuestionsInput.value = 6;
   timeBeforeHintInput.value = 5;
   timeAfterHintInput.value = 5;
+  // Reset category selectors
+  populateMainCategories(); // This will also populate subcategories
+  mainCategorySelect.value = 'christian';
+  subCategorySelect.value = 'books';
   renderPlayers();
   renderGame();
 });
@@ -402,10 +757,16 @@ function renderGame(){
   if(state.phase === 'playing'){
     const cp = state.players[state.currentPlayerIndex] || '—';
     const qIndex = state.usedCountThisPlayer || 0;
+
+    // Get display name for the selected sub-category
+    const currentSubCategoryDisplayName = ALL_CATEGORIES[state.mainCategory]
+                                          ?.subcategories[state.subCategory]
+                                          ?.name || '❓ Unknown Category';
+
     gameInner.innerHTML = `
       <div class="game-top">
         <div class="banner">
-          <div class="category-badge">${state.category === 'books' ? '📖 Guess the Book' : '👤 Guess the Character'}</div>
+          <div class="category-badge">${currentSubCategoryDisplayName}</div>
           <div style="margin-top:8px;color:var(--muted)">Player</div>
           <div class="current-player">${escapeHtml(cp)}</div>
         </div>
@@ -451,7 +812,7 @@ function renderGame(){
       persist();
       // if all players have taken a turn (we'll detect end when all players have played full set) — but to keep simple: start next player's round
       renderGame();
-      startPlayerRound(false);
+      setTimeout(()=> startPlayerRound(false), 600);
     };
     return;
   }
@@ -468,7 +829,7 @@ function renderGame(){
     `;
     document.getElementById('nextFullRoundBtn').onclick = ()=> {
       // start a new full round: new deck, reset player index and scores
-      state.deck = shuffle(cloneDeckForCategory(state.category));
+      state.deck = shuffle(cloneDeckForCategory(state.mainCategory, state.subCategory));
       state.usedCountThisPlayer = 0;
       state.currentPlayerIndex = 0;
       state.scores = {}; state.players.forEach(p=>state.scores[p]=0);
@@ -494,7 +855,7 @@ function renderScores(){
 /* Start a player's round: they will answer questionsPerPlayer questions */
 function startPlayerRound(resume=false){
   // if deck empty, refill
-  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeckForCategory(state.category));
+  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeckForCategory(state.mainCategory, state.subCategory));
   // reset used count for player if not resuming
   if(!resume) state.usedCountThisPlayer = 0;
   // if all players have had their rounds already? We'll detect end when we've cycled through all players and they each finished questionsPerPlayer
@@ -518,14 +879,14 @@ function startQuestion(resume=false){
     } else {
       persist();
       renderGame();
-      // start next player's round
+      // small delay between players
       setTimeout(()=> startPlayerRound(false), 350);
       return;
     }
   }
 
   // ensure deck has questions
-  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeckForCategory(state.category));
+  if(!state.deck || state.deck.length === 0) state.deck = shuffle(cloneDeckForCategory(state.mainCategory, state.subCategory));
 
   // pick random question from deck and remove
   const idx = Math.floor(Math.random() * state.deck.length);
@@ -629,11 +990,18 @@ function safePlay(audioEl){
     state = Object.assign(state, saved);
     // repopulate UI inputs
     namesInput.value = state.players.join('\n');
-    categorySelect.value = state.category || 'books';
     numQuestionsInput.value = state.questionsPerPlayer || 6;
     timeBeforeHintInput.value = state.timeBeforeHint || 5;
     timeAfterHintInput.value = state.timeAfterHint || 5;
+  } else {
+    // Set default categories if no saved state
+    state.mainCategory = 'christian';
+    state.subCategory = 'books';
   }
+  populateMainCategories(); // Populate main category dropdown first
+  // No need to explicitly set mainCategorySelect.value here, populateMainCategories sets it from state.mainCategory
+  populateSubCategories(); // Then populate sub-categories based on the selected main category
+  // No need to explicitly set subCategorySelect.value here, populateSubCategories sets it from state.subCategory
   renderPlayers();
   renderGame();
   // don't auto-start ticks — user must press Resume or Start to re-enable sounds and ticking
@@ -642,3 +1010,4 @@ function safePlay(audioEl){
 </script>
 </body>
 </html>
+�
