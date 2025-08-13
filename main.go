@@ -35,7 +35,7 @@ type Country struct {
 	CurrencyName   string             `bson:"currency_name" json:"currency_name"`
 	Status         string             `bson:"status" json:"status"`
 	CreatedAt      time.Time          `bson:"created_at" json:"created_at"`
-	UpdatedAt      time.Time          `bson:"updated_at" json:"updated_at"`
+	UpdatedAt      *time.Time         `bson:"updated_at" json:"updated_at"`
 }
 
 type State struct {
@@ -100,17 +100,12 @@ func connectMongo() *mongo.Database {
 func seedData(db *mongo.Database, baseURL string) error {
 	ctx := context.Background()
 	now := time.Now()
-	// clear old data to avoid duplicates
-	db.Collection("countries").DeleteMany(ctx, bson.M{})
-	db.Collection("states").DeleteMany(ctx, bson.M{})
-	db.Collection("lgas").DeleteMany(ctx, bson.M{})
-	db.Collection("cities").DeleteMany(ctx, bson.M{})
 
 	countriesCol := db.Collection("countries")
 	statesCol := db.Collection("states")
 	lgasCol := db.Collection("lgas")
 
-	resp, err := http.Get(fmt.Sprintf("%s/api/Countries?status=active&page=1", baseURL))
+	resp, err := http.Get(fmt.Sprintf("%s/api/Countries", baseURL))
 	if err != nil {
 		return err
 	}
@@ -124,13 +119,30 @@ func seedData(db *mongo.Database, baseURL string) error {
 	}
 
 	for _, c := range countryResp.Items {
+		// Check if country exists
+		filter := bson.M{"name": c.Name}
+		findOpts := options.FindOne().SetCollation(&options.Collation{
+			Locale:   "en",
+			Strength: 2,
+		})
+
+		var existing Country
+		err := countriesCol.FindOne(ctx, filter, findOpts).Decode(&existing)
+		if err == nil {
+			fmt.Printf("Skipping existing country: %s\n", c.Name)
+			continue
+		} else if err != mongo.ErrNoDocuments {
+			return err
+		}
+
+		// Insert new country
 		status := StatusInactive
 		if c.StatusEnum == 1 {
 			status = StatusActive
 		}
 
 		countryOID := primitive.NewObjectID()
-		_, err := countriesCol.InsertOne(ctx, Country{
+		_, err = countriesCol.InsertOne(ctx, Country{
 			ID:             countryOID,
 			Name:           c.Name,
 			IsoCode:        c.IsoCode,
@@ -141,13 +153,13 @@ func seedData(db *mongo.Database, baseURL string) error {
 			CurrencyName:   c.CurrencyName,
 			Status:         status,
 			CreatedAt:      now,
-			UpdatedAt:      now,
+			// UpdatedAt:      now,
 		})
 		if err != nil {
 			return err
 		}
 
-		// Get states
+		// Get states for this country
 		stateResp, err := http.Get(fmt.Sprintf("%s/api/Countries/get-states-by-countryId/%d", baseURL, c.CountryID))
 		if err != nil {
 			return err
@@ -160,6 +172,24 @@ func seedData(db *mongo.Database, baseURL string) error {
 		}
 
 		for _, s := range states {
+			// Check if state exists for this country
+			stateFilter := bson.M{
+				"name":       s.Name,
+				"country_id": countryOID,
+			}
+			stateFindOpts := options.FindOne().SetCollation(&options.Collation{
+				Locale:   "en",
+				Strength: 2,
+			})
+			var existingState State
+			if err := statesCol.FindOne(ctx, stateFilter, stateFindOpts).Decode(&existingState); err == nil {
+				fmt.Printf("Skipping existing state: %s (Country: %s)\n", s.Name, c.Name)
+				continue
+			} else if err != mongo.ErrNoDocuments {
+				return err
+			}
+
+			// Insert new state
 			stateOID := primitive.NewObjectID()
 			_, err := statesCol.InsertOne(ctx, State{
 				ID:        stateOID,
@@ -172,7 +202,7 @@ func seedData(db *mongo.Database, baseURL string) error {
 				return err
 			}
 
-			// Get LGAs
+			// Get LGAs for this state
 			lgaResp, err := http.Get(fmt.Sprintf("%s/api/Countries/lga-by-stateId/%d", baseURL, s.ID))
 			if err != nil {
 				return err
@@ -185,6 +215,24 @@ func seedData(db *mongo.Database, baseURL string) error {
 			}
 
 			for _, l := range lgas {
+				// Check if LGA exists for this state
+				lgaFilter := bson.M{
+					"name":     l.Name,
+					"state_id": stateOID,
+				}
+				lgaFindOpts := options.FindOne().SetCollation(&options.Collation{
+					Locale:   "en",
+					Strength: 2,
+				})
+				var existingLGA LGA
+				if err := lgasCol.FindOne(ctx, lgaFilter, lgaFindOpts).Decode(&existingLGA); err == nil {
+					fmt.Printf("Skipping existing LGA: %s (State: %s)\n", l.Name, s.Name)
+					continue
+				} else if err != mongo.ErrNoDocuments {
+					return err
+				}
+
+				// Insert new LGA
 				_, err := lgasCol.InsertOne(ctx, LGA{
 					ID:        primitive.NewObjectID(),
 					Name:      l.Name,
