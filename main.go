@@ -93,7 +93,8 @@ func connectMongo() *mongo.Database {
 	if err := client.Connect(ctx); err != nil {
 		log.Fatal(err)
 	}
-	return client.Database("geo_data")
+	return client.Database(os.Getenv("MONGO_DB_NAME"))
+	// return client.Database("geo_data")
 }
 
 func seedData(db *mongo.Database, baseURL string) error {
