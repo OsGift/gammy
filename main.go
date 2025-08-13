@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -33,24 +34,32 @@ type Country struct {
 	CurrencySymbol string             `bson:"currency_symbol" json:"currency_symbol"`
 	CurrencyName   string             `bson:"currency_name" json:"currency_name"`
 	Status         string             `bson:"status" json:"status"`
+	CreatedAt      time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt      time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 type State struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
 	Name      string             `bson:"name" json:"name"`
 	CountryID primitive.ObjectID `bson:"country_id" json:"country_id"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 type LGA struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name    string             `bson:"name" json:"name"`
-	StateID primitive.ObjectID `bson:"state_id" json:"state_id"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Name      string             `bson:"name" json:"name"`
+	StateID   primitive.ObjectID `bson:"state_id" json:"state_id"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 type City struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty" json:"id"`
-	Name    string             `bson:"name" json:"name"`
-	StateID primitive.ObjectID `bson:"state_id" json:"state_id"`
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Name      string             `bson:"name" json:"name"`
+	StateID   primitive.ObjectID `bson:"state_id" json:"state_id"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
 
 type ExternalCountry struct {
@@ -89,7 +98,7 @@ func connectMongo() *mongo.Database {
 
 func seedData(db *mongo.Database, baseURL string) error {
 	ctx := context.Background()
-
+	now := time.Now()
 	// clear old data to avoid duplicates
 	db.Collection("countries").DeleteMany(ctx, bson.M{})
 	db.Collection("states").DeleteMany(ctx, bson.M{})
@@ -130,6 +139,8 @@ func seedData(db *mongo.Database, baseURL string) error {
 			CurrencySymbol: c.CurrencySymbol,
 			CurrencyName:   c.CurrencyName,
 			Status:         status,
+			CreatedAt:      now,
+			UpdatedAt:      now,
 		})
 		if err != nil {
 			return err
@@ -153,6 +164,8 @@ func seedData(db *mongo.Database, baseURL string) error {
 				ID:        stateOID,
 				Name:      s.Name,
 				CountryID: countryOID,
+				CreatedAt: now,
+				UpdatedAt: now,
 			})
 			if err != nil {
 				return err
@@ -172,9 +185,11 @@ func seedData(db *mongo.Database, baseURL string) error {
 
 			for _, l := range lgas {
 				_, err := lgasCol.InsertOne(ctx, LGA{
-					ID:      primitive.NewObjectID(),
-					Name:    l.Name,
-					StateID: stateOID,
+					ID:        primitive.NewObjectID(),
+					Name:      l.Name,
+					StateID:   stateOID,
+					CreatedAt: now,
+					UpdatedAt: now,
 				})
 				if err != nil {
 					return err
@@ -316,6 +331,78 @@ func main() {
 				}
 			}
 		}
+		c.JSON(200, gin.H{"message": "cities added successfully"})
+	})
+
+	r.POST("/cities", func(c *gin.Context) {
+		var cityMap map[string][]string
+		if err := c.BindJSON(&cityMap); err != nil {
+			c.JSON(400, gin.H{"error": "invalid input"})
+			return
+		}
+
+		normalize := func(s string) string {
+			s = strings.ToLower(strings.TrimSpace(s))
+			s = strings.ReplaceAll(s, " state", "")
+			s = strings.ReplaceAll(s, " county", "")
+			return strings.TrimSpace(s)
+		}
+
+		ctx := context.Background()
+		statesCol := db.Collection("states")
+		citiesCol := db.Collection("cities")
+
+		for rawState, cities := range cityMap {
+			normState := normalize(rawState)
+
+			// Use regex match to avoid exact equality issues
+			var state State
+			err := statesCol.FindOne(ctx, bson.M{
+				"name": bson.M{
+					"$regex":   "^" + regexp.QuoteMeta(normState) + "( state)?$",
+					"$options": "i", // case-insensitive
+				},
+			}).Decode(&state)
+			if err != nil {
+				// Skip unknown state
+				continue
+			}
+
+			for _, cityName := range cities {
+				trimmed := strings.TrimSpace(cityName)
+				if trimmed == "" {
+					continue
+				}
+
+				count, err := citiesCol.CountDocuments(ctx, bson.M{
+					"state_id": state.ID,
+					"name": bson.M{
+						"$regex":   "^" + regexp.QuoteMeta(trimmed) + "$",
+						"$options": "i",
+					},
+				})
+				if err != nil {
+					c.JSON(500, gin.H{"error": err.Error()})
+					return
+				}
+
+				if count == 0 {
+					now := time.Now()
+					_, err := citiesCol.InsertOne(ctx, City{
+						ID:        primitive.NewObjectID(),
+						Name:      trimmed,
+						StateID:   state.ID,
+						CreatedAt: now,
+						UpdatedAt: now,
+					})
+					if err != nil {
+						c.JSON(500, gin.H{"error": err.Error()})
+						return
+					}
+				}
+			}
+		}
+
 		c.JSON(200, gin.H{"message": "cities added successfully"})
 	})
 
